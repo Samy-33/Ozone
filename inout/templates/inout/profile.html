@@ -1,0 +1,28 @@
+{% extends 'inout/base.html' %}
+{% load static %}
+<!--{% block title %} User Information {% endblock %}
+
+<a href='{% url "inout home" %}' style="float:left;">Home</a>
+<a href='{%url "inout logout" %}' style="float:right;">Logout</a>
+-->
+
+
+
+{% block content %}
+<link href='{% static "inout/css/profile.css" %}' type='text/css' rel='stylesheet' />
+<script type="text/javascript" src='{% static "inout/js/javascript.js" %}'></script>
+<div class='header'>
+<!--
+	<a href='{% url "inout:home" %}' style="float:left;">Home</a>
+	<center><a href='{%url "inout:profile" %}'>Profile</a> | <a href='{% url 'inout:code' %}'>Code</a>
+	<a href='{%url "inout:logout" %}' style="float:right;">Logout</a></center>
+	<br>
+	<hr>
+-->
+</div>
+<h1>{{user.username}}</h1><br><br>
+{% if user.is_staff %}
+	<button onclick='getCon()' >Contests</button><br><br>
+	<div id="cons"></div>
+{% endif %}
+{% endblock %}

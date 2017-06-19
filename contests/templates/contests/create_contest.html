@@ -1,0 +1,24 @@
+{% extends 'inout/base.html' %}
+{% load static %}
+
+{% block content %}
+	<link href='{% static "contests/css/create.css" %}' rel='stylesheet' type='text/css' />
+	Welcome {{ request.user.username }}, You can create your own contest here.
+	{% if 'done' in request.POST %}
+		Contest has been made, waiting for approval.
+	{% elif request.user.profile.tobecon == 1 %}
+		You have already created the contest, waiting approval
+	{% else %}
+	<br><br>
+	<div class="container">
+<!--		<table>-->
+			<form method='post'>
+				{% csrf_token %}
+				{{ form.as_p }}
+				<input type="hidden" name="done" value=1 />
+				<input type="submit" value='Create' />
+			</form>
+<!--		</table> -->
+	</div>
+	{% endif %}
+{% endblock %}

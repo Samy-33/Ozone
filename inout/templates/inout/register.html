@@ -1,0 +1,30 @@
+{% extends 'inout/base.html' %}
+
+{% block title %} Register {% endblock %}
+
+{% block content %}
+
+		<center>
+			<h1>Register</h1>
+			<form method='post' action='{% url  "inout:register"%}'>
+				
+
+				{% csrf_token %}
+				<table>
+					{% for field in form %}
+						<tr><td>
+						{{ field.label_tag}}
+
+							<span style='color:red;'>*</span>
+							</td>
+
+							<td>{{field}}</td>
+						</tr>
+
+					{% endfor %}
+				</table>
+				<input type="submit" value="register"/> Or <a href='{% url 'inout:login' %}'>Login</a>
+
+			</form>
+		</center>
+{% endblock %}

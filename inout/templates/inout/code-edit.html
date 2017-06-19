@@ -1,0 +1,27 @@
+{% extends 'inout/base.html' %}
+
+{% block content %}
+<!--
+	<a href='{% url "inout:home" %}' style="float:left;">Home</a>
+	<center><a href='{%url "inout:profile" %}'>Profile</a> | <a href='{% url 'inout:code' %}'>Code</a>
+	<a href='{%url "inout:logout" %}' style="float:right;">Logout</a>
+	<br><br>
+	<hr>
+--><style>
+	.code{
+		width:400px;
+		height:300px;
+	}
+	.input{
+		width:400px;
+		height:150px;
+	}
+</style>
+	<h1> Execute the Code: <br></h1>
+	<form action="/code/" method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+		<input style="margin-left:200px;" type=submit value="submit" />
+	</form>
+	<hr>
+{% endblock %}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+	<head>
+		<title> Welcome to Ozone Judge </title>
+		<script src='{% static "inout/js/jquery.js" %}' type=text/javascript> </script>
+		<link href='{% static "inout/css/bootstrap.min.css" %}' rel='stylesheet' type='text/css' />
+		<style>
+			body{
+				margin-left:30px;
+				margin-right:30px;
+			}
+		</style>
+	</head>
+	<body>
+		<center><p style="color:blue; font-size:30px;"><a href='{% url "inout:home"%}' >Ozone</a><sup style="font-size:10px;">iiitdmj</sup></p>
+		<hr>
+		</center>
+		<a href='{% url "inout:home" %}' style="float:left; margin-left:20px;">Home</a>
+		<center><a href='/contests/'>Contests</a> | <a href='{%url "inout:profile" %}'>Profile</a> | <a href='{% url "inout:code" %}'>Code</a> | <a href='/practice/'>Practice</a>
+		<a href='{%url "inout:logout" %}' style="float:right; margin-right:20px;">Logout</a>
+		<br>
+			<hr><br></center>
+		{% block content %}
+		{% endblock %}
+	</body>
+</html>

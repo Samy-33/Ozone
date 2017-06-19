@@ -1,0 +1,12 @@
+{% extends 'inout/base.html' %}
+{% block content %}
+{{user.username}}
+<form method='post' action="/activate/">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<input type="hidden" name=hdd value={{ uuuuu }} />
+	<input type="hidden" name=usr value={{ usr }} />
+	<input type=submit value=activate />
+</form>
+
+{% endblock %}
