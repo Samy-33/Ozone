@@ -1,0 +1,13 @@
+.upcoming{
+	border: solid 1px black;
+	width:40%;
+	background-color:aliceblue;
+	padding:20px;
+}
+
+.current{
+	border: solid 1px black;
+	width:40%;
+	background-color: aquamarine;
+	padding:20px;
+}
