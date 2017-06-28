@@ -1,0 +1,23 @@
+{% extends 'inout/base.html' %}
+
+{% block content %}
+
+	{% if not contest %}
+		<p> You can't edit this contest. Sorry for inconvinience caused.</p>
+	{% endif %}
+	{% if contest.admin == request.user %}
+		<p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit</button></a></span></p>
+	{% endif %}
+	{% if pp and request.user != contest.admin %}
+		Contest is still to start
+	{% else %}
+		{% for ques in contest.problem_set.all %}
+			<div class="ques">
+				<h2>
+					<a href="/contests/q/{{contest.contest_code}}/p/{{ques.code}}/">{{ques.name}}</a>
+				</h2><br>
+			</div>
+		{% endfor %}
+	{% endif %}
+	
+{% endblock %}

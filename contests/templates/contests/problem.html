@@ -1,0 +1,17 @@
+{% extends 'inout/base.html' %}
+{% load static %}
+{% block content %}
+	<link href="{% static 'contests/css/contest.css' %}" rel=stylesheet type="text/css" />
+	<center><h1>{{ques.name}}</h1><br><b>{{contest.contest_code}}</b>:{{ques.code}}</center><br>
+	<dl>
+		<dt>
+		<h3>
+			Statement:
+		</h3></dt>
+		<dd>
+		
+			{{ques.text}}
+		</dd><br><br>
+		<b><i>Time Limit:</i></b>{{ques.time_lim}}
+	</dl>
+{% endblock %}

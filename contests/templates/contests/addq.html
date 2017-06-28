@@ -1,0 +1,10 @@
+{% extends 'inout/base.html' %}
+
+{% block content %}
+	<center> <h2>New Question</h2></center><br><br>
+	<form method=post>
+		{% csrf_token %}
+		{{form.as_p}}
+		<input type=submit  value="Add" />
+	</form>
+{% endblock %}

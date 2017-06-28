@@ -11,3 +11,12 @@
 	background-color: aquamarine;
 	padding:20px;
 }
+
+dl{
+	margin-left:10px;
+	margin-bottom:20px;
+}
+
+dd{
+	margin-left:30px;
+}

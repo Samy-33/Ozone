@@ -1,0 +1,18 @@
+{% extends 'inout/base.html' %}
+{% load static %}
+{% block content %}
+
+
+	{% if not contest %}
+		<p>You can't edit this contest</p>
+	{% else %}
+		{% for ques in contest.problem %}
+			<div class="ques">
+				<h2>{{ques.name}}</h2><br>
+				<a href="/contests/q/edit/{{contest.contest_code}}/{{ques.code}}/"><button>Edit</button></a>
+			</div>
+			<br><br>
+		{% endfor %}
+		<a href="/contests/q/edit/{{contest.contest_code}}/a/"><button>Add New One</button></a>
+	{% endif %}
+{% endblock %}
