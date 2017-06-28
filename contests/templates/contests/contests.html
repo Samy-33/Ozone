@@ -1,6 +1,42 @@
 {% extends 'inout/base.html' %}
+{% load static %}
 {% block content %}
 
-There is no contest going on right now. <span style='float:right;'><a href='create/'><button>Create Contest</button></a></span>
+<span style='float:right;'><a href='create/'><button>Create Contest</button></a></span>
+<link href='{% static "contests/css/contest.css" %}' rel='stylesheet' type='text/css' />
+<div class="current">
+	<h1> CURRENT </h1>
+	{% if current %}
+		{% for contest in current %}
+			<a href='q/{{ contest.contest_code }}/'>
+				<div class="cont">
+					<h2>
+						{{contest.name}}
+					</h2><br>
+				</div>
+			</a><br><br>
 
+		{% endfor %}
+	{% else %}
+		There is no contest going on right now.
+	{% endif %}
+</div>
+<br><br>
+<div class="upcoming">
+	<h1> UPCOMING</h1>
+	{% if upcoming %}
+		{% for contest in upcoming %}
+			
+			<a href="q/{{ contest.contest_code }}/">
+				<div class="cont">
+					<h2>
+						{{contest.name}}
+					</h2><br>
+				</div>
+			</a><br><br>
+		{% endfor %}
+	{% else %}
+		No upcoming Contests, yet.
+	{% endif %}
+</div>
 {% endblock %}

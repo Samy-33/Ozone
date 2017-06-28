@@ -12,14 +12,17 @@ from django.contrib.auth.models import User
 @login_required(login_url='/')
 def index(request):
 	now = datetime.datetime.now()
-	upcoming = None
-	current = None
+#	upcoming = Contest.objects.filter(allowed=1)
+#	print(upcoming)
+#	current = upcoming[:]
 	try:
-		upcoming = Contest.objects.filter(start_date__gt=datetime.datetime.now()).order_by('-start_date')
+#		upcoming = Contest.objects.filter(allowed=0)
+		upcoming = Contest.objects.filter(Q(start_date__gt=datetime.datetime.now())&Q(allowed=1)).order_by('-start_date')
 	except:
 		upcoming = []
 	try:
-		current = Contest.objects.filter(Q(start_date__lt=datetime.datetime.now())|Q(end_date__gt=datetime.datetime.now())).order_by('-start_date')
+#		current = Contest.objec
+		current = Contest.objects.filter(Q(start_date__lte=datetime.datetime.now())&Q(end_date__gt=datetime.datetime.now())&Q(allowed=1)).order_by('-start_date')
 	except:
 		current = []
 	try:
@@ -36,12 +39,16 @@ def create(request):
 		if(form.is_valid()):
 #			stdt = datetime.datetime.strptime(form.cleaned_data['start_date'], "%Y-%m-%d %H:%M")
 #			endt = datetime.datetime.strptime(form.cleaned_data['end_date'], "%Y-%m-%d %H:%M")
+			p1 = form.cleaned_data['start_date']
+			p2 = form.cleaned_data['end_date']
+#			p1.tzinfo = 'ist'
+#			p2.tzinfo = 'ist'
 			c = Contest.objects.create(
 				admin = request.user,
 				name = form.cleaned_data['name'],
 				contest_code=form.cleaned_data['contest_code'],
-				start_date=form.cleaned_data['start_date'],
-				end_date=form.cleaned_data['end_date'],
+				start_date=p1,
+				end_date=p2,
 				allowed=0,
 			)
 			request.user.profile.tobecon = True
@@ -55,3 +62,7 @@ def create(request):
 		form = CreateContest(initial={})
 		return render(request, 'contests/create_contest.html', {'form':form})
 #	return HttpResponse("Welcome, here you can create your own contests!")
+
+@login_required(login_url="/")
+def contest(request, code=None):
+	return HttpResponse("Ok!!")

@@ -7,7 +7,7 @@
 	{% if 'done' in request.POST %}
 		Contest has been made, waiting for approval.
 	{% elif request.user.profile.tobecon == 1 %}
-		You have already created the contest, waiting approval
+		You have already created the contest
 	{% else %}
 	<br><br>
 	<div class="container">

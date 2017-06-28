@@ -8,6 +8,7 @@ from inout.models import Profile
 from contests.models import Contest, Problem
 import random, socks, time
 from django.core.mail import send_mail
+from django.core import serializers
 import os, json
 from subprocess import *
 
@@ -127,13 +128,40 @@ def index(request):
 @login_required(login_url='/')
 def give_contests(request):
 	try:
-		contest_requests = Contest.objects.get(allowed=0)
-		return JsonResponse(contest_requests, safe=False)
+#		print("hello")
+		c = Contest.objects.filter(allowed=0)
+#		print(len(c))
+		if(len(c)==0):
+			return JsonResponse({'status':'failure'}, status=200)
+		contest_requests = serializers.serialize("json", c)
+#		contest_requestts
+#		print(contest_requests)
+		return HttpResponse(contest_requests, content_type='application/json')
 #		return JsonResponse(contest_requests, safe=False, status=200)
-	except:
+	except Exception as e:
+		print(str(e))
 		return JsonResponse({'status':'failure'}, status=404)
 	
 
+@login_required(login_url="/")
+def allow(request):
+	try:
+		if(request.method == 'GET'):
+			pp = int(request.GET.get('ag'))
+			print pp
+			c = Contest.objects.get(pk=int(request.GET.get('pk')))
+			if(pp == 1):
+				c.allowed = 1
+				c.save()
+				return JsonResponse({'done':'true'}, status=200)
+			else:
+				usr = c.admin
+				usr.profile.tobecon = False
+				usr.save()
+				c.delete()
+				return JsonResponse({'done':'true'}, status=200)
+	except Exception as e:
+		return JsonResponse({'done':'false'}, status=400)
 @login_required(login_url='/')
 def profile(request):
 	return render(request, "inout/profile.html")
