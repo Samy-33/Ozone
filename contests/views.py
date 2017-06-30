@@ -7,6 +7,8 @@ from django.db.models import Q
 from .forms import *
 from django.contrib.auth.models import User
 import pytz
+from django.views.decorators.csrf import csrf_protect
+
 
 
 @login_required(login_url='/')
@@ -112,3 +114,8 @@ def addq(request, code):
 			print(str(e))
 			return render(request, 'contests/addq.html', {'form':Prob(initial={})})
 	return render(request, 'contests/addq.html', {'form':Prob(initial={})})
+
+@csrf_protect
+@login_required(login_url="/")
+def submit(request, code):
+	return HttpResponse("Still to add this code, going to be long. I guess.")
