@@ -22,5 +22,5 @@ class Problem(models.Model):
 	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
 	name = models.CharField(max_length=15, blank=False, null=False)
 	code = models.CharField(max_length=10, blank=False, null=False, unique=True)
-	text = models.CharField(max_length=150, blank=False, null=False)
+	text = models.CharField(max_length=500, blank=False, null=False)
 	time_lim = models.FloatField(default=1.0, blank=False, null=False)
