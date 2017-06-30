@@ -23,7 +23,8 @@ def index(request):
 	except:
 		current = []
 	try:
-		usrs_contest = Contest.objects.filter(Q(username=request.user.username))
+		usrs_contest = Contest.objects.filter(Q(admin=request.user))
+#		print usrs_contest
 	except:
 		usrs_contest = []
 	return render(request, 'contests/contests.html', {'upcoming':upcoming, 'current':current, 'usrs_contest':usrs_contest})

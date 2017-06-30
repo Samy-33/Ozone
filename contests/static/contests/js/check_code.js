@@ -25,10 +25,8 @@ $.ajaxSetup({
 
 
 
-function submit(problem, token){
+function submit(problem){
 	var code = document.getElementById("editcode").value;
-//	alert(code);
-	alert(token);
 	var lang = document.getElementById("lang").value;
 
 	$.ajax({
