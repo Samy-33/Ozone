@@ -1,10 +1,11 @@
-{% extends 'inout/base.html' %}
-
-{% block title %} Register {% endblock %}
-
-{% block content %}
-
-		<center>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Welcome to Ozone Judge </title>
+	</head>
+	<body>
+		<center><p style="color:blue; font-size:30px;"><a href='{% url "inout:home"%}' >Ozone</a><sup style="font-size:10px;">iiitdmj</sup></p>
+		<hr><br>
 			<h1>Register</h1>
 			<form method='post' action='{% url  "inout:register"%}'>
 				
@@ -12,19 +13,12 @@
 				{% csrf_token %}
 				<table>
 					{% for field in form %}
-						<tr><td>
-						{{ field.label_tag}}
-
-							<span style='color:red;'>*</span>
-							</td>
-
-							<td>{{field}}</td>
-						</tr>
-
+						<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
 					{% endfor %}
 				</table>
 				<input type="submit" value="register"/> Or <a href='{% url 'inout:login' %}'>Login</a>
 
 			</form>
 		</center>
-{% endblock %}
+	</body>
+</html>

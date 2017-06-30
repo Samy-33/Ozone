@@ -11,12 +11,7 @@
 				{% csrf_token %}
 				<table>
 					{% for field in form %}
-						<tr><td>
-							{{ field.label_tag }}
-						</td>
-						<td>
-							{{ field }}
-						</td></tr>
+						<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
 					{% endfor %}
 				</table>
 				<button type="submit" > Login </button> Or <a href="/register/">Register</a>

@@ -8,15 +8,12 @@ from contests.models import Problem
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	hd = models.CharField(max_length=10, blank=True, null=False)
-#	name = models.CharField(max_length=50, blank=True, null=True)
-#	activated = models.IntegerField(default=0, blank=True, null=False)
 	activation_code = models.CharField(max_length=6, blank=True)
 	birth = models.DateField(null=True, blank=True)
 	rating = models.IntegerField(blank=True, null=True)
 	tobecon = models.BooleanField(blank=False, null=False, default=False)
 	def __str__(self):
-		return self.hd
+		return self.user.username
 
 
 @receiver(post_save, sender=User)

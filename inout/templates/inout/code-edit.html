@@ -18,10 +18,14 @@
 	}
 </style>
 	<h1> Execute the Code: <br></h1>
+<table>
 	<form action="/code/" method="post">
 		{% csrf_token %}
-		{{ form.as_p }}
-		<input style="margin-left:200px;" type=submit value="submit" />
+		{% for field in form %}
+			<tr><th>{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
+		{% endfor %}
+		<tr><td><input style="margin-left:200px;" type=submit value="submit" /></td></tr>
 	</form>
+	</table>
 	<hr>
 {% endblock %}

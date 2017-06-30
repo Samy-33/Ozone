@@ -30,19 +30,6 @@ cmd = {
 }
 
 
-#def compile(request, filename)
-
-
-#from django.contrib.auth.models improt Users
-# Create your views here.
-
-#def login(request):
-#	if request.user.is_authenticated:
-#		return render(request, "inout/home.html")
-#	#else: return auth_views.login(request)
-#	#auth_views.login(request, {'template_name':'inout/login.html'})
-
-
 
 def clogin(request):
 	if request.user.is_authenticated():
@@ -53,7 +40,6 @@ def clogin(request):
 	else:
 		return auth_views.login(request, "inout/login.html")
 
-#@csrf.csrf_protect
 def register(request):
 	form = RegistrationForm()
 	if request.user.is_authenticated():
@@ -73,26 +59,23 @@ def register(request):
 			for i in range(6):
 				code += chr(random.randrange(48, 122))
 			p = Profile.objects.get(user=u)
-			p.hd = form.cleaned_data['hd']
 			p.birth = form.cleaned_data['dob']
 			p.activation_code = code
+			print(code)
 			p.rating = 1500
-			#p = Profile.objects.create(user=u, hd=form.cleaned_data['hd'], birth=form.cleaned_data['dob'], activation_code=code, rating=1500)
 			p.save()
-#			u.save()
-#			send_mail("Activation Code", "This is your activation Code: %s"%code, 'saket.patel@iiitdmj.ac.in', ['saket.is.sam@gmail.com'])
+
+#			send_mail("Activation Code", "This is your activation Code: %s"%code, '<sender mail address>', [list of all the recipients])
 			##Email the user
-			hdd = form.cleaned_data['hd']
 			usr = form.cleaned_data['username']
 			form = ActivateForm(initial={})
-			return render(request, 'inout/activate.html', {'uuuuu':hdd, 'usr':usr, 'form':form})
+			return render(request, 'inout/activate.html', {'usr':usr, 'form':form})
 		else:
 			return render(request, 'inout/register.html', {'form':form})
 	else:
 		return render(request, 'inout/register.html', {'form':form})
 	
 
-#@login_required(login_url="/")
 def activate(request):
 	form = None
 	try:
@@ -100,16 +83,14 @@ def activate(request):
 			form = ActivateForm(request.POST)
 			if(not request.user.is_active):
 				if form.is_valid():
-					print(form.cleaned_data['act_code'])
-					print(Profile.objects.get(hd=request.POST.get('hdd')).activation_code)
-					if(form.cleaned_data['act_code'] == Profile.objects.get(hd=request.POST.get('hdd')).activation_code):
-						#p = Profile.objects.get(user=request.user)
+					cd = User.objects.get(username=request.POST.get('usr')).profile.activation_code
+					print(cd)
+					if(form.cleaned_data['act_code'] == cd):
 						u = User.objects.get(username=request.POST.get('usr'))
 						u.is_active = True
 						u.activation_code = ""
 						u.save()
 						st = "tmp/%s"%(request.POST.get('usr'))
-#						print(st)
 						os.mkdir(st)
 						return redirect('/')
 				return render(request, 'inout/activate.html', {'form':form})
@@ -128,16 +109,12 @@ def index(request):
 @login_required(login_url='/')
 def give_contests(request):
 	try:
-#		print("hello")
 		c = Contest.objects.filter(allowed=0)
-#		print(len(c))
 		if(len(c)==0):
 			return JsonResponse({'status':'failure'}, status=200)
 		contest_requests = serializers.serialize("json", c)
-#		contest_requestts
-#		print(contest_requests)
 		return HttpResponse(contest_requests, content_type='application/json')
-#		return JsonResponse(contest_requests, safe=False, status=200)
+
 	except Exception as e:
 		print(str(e))
 		return JsonResponse({'status':'failure'}, status=404)
@@ -162,17 +139,19 @@ def allow(request):
 				return JsonResponse({'done':'true'}, status=200)
 	except Exception as e:
 		return JsonResponse({'done':'false'}, status=400)
+	
+	
 @login_required(login_url='/')
 def profile(request):
 	return render(request, "inout/profile.html")
+
 
 @login_required(login_url='/')
 def code_edit(request):
 	form = CodeForm(initial={})
 	if request.method == 'POST':
 		form = CodeForm(request.POST)
-		
-		#fil = str(request.POST.get('code'))
+
 		print(str(request.POST.get('inpt')))
 		lng = str(request.POST.get('language'))
 		ext = extensions[lng]
@@ -180,13 +159,12 @@ def code_edit(request):
 		filename="%s/fil%s"%(directory, ext)
 		inp = "%s/in"%(directory)
 		with open(filename, "w") as fil:
-#			fil.write("#!/usr/bin/env python\n")
 			fil.write(str(request.POST.get('code')))
+			
 		if('python' not in lng):
 			try:
 				check_output(cmd[lng][0]%(filename, "%s/a.out"%(directory)), shell=True, stderr=STDOUT)
 				os.system("chmod u+rx %s"%filename)
-#				os.system("chmod u+x ")
 			except CalledProcessError as e:
 				e = e.output.split("\n")
 				e = "<br>".join(e)
@@ -211,7 +189,6 @@ def code_edit(request):
 			try:
 				#Change here so that file runs on each testcase (loop)
 				with open(inp, "w") as fil:
-#					print(directory+"/in")
 					fil.write(str(request.POST.get('inpt')))
 				p = check_output(cmd[lng][0]%(filename, inp), shell=True, stderr=STDOUT)
 				os.system("rm %s"%(inp))
