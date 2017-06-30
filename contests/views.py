@@ -23,7 +23,7 @@ def index(request):
 	except:
 		current = []
 	try:
-		usrs_contest = Contest.objects.get(username=request.user.username)
+		usrs_contest = Contest.objects.filter(Q(username=request.user.username))
 	except:
 		usrs_contest = []
 	return render(request, 'contests/contests.html', {'upcoming':upcoming, 'current':current, 'usrs_contest':usrs_contest})
@@ -73,7 +73,9 @@ def editc(request, code):
 	con = get_object_or_404(Contest, Q(contest_code=code)&Q(end_date__gte=datetime.datetime.now()))
 
 	if(con.admin == request.user):
-		return render(request, 'contests/editc.html', {'contest':con})
+		if(con.end_date >= datetime.datetime.now()): aled = True
+		else: aled = False
+		return render(request, 'contests/editc.html', {'contest':con, 'aled':aled})
 	return render(request, 'contests/editc.html', {'contest':False})
 
 

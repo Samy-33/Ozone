@@ -1,22 +1,19 @@
 .upcoming{
 	border: solid 1px black;
-	width:40%;
 	background-color:aliceblue;
-	padding-left:10px;
-	padding-bottom:10px;
+	padding:10px;
+	height:20em;
+	overflow-y:auto;
 }
 
 .current{
 	border: solid 1px black;
-	width:40%;
 	background-color: aquamarine;
-	padding-left:10px;
-	padding-bottom:10px;
+	padding:10px;
+	height:20em;
+	overflow-y:auto;
 }
 
-a .cont{
-	margin-left:30px;
-}
 
 dl{
 	margin-left:20px;

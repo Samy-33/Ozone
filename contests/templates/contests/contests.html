@@ -4,39 +4,65 @@
 
 <span style='float:right;'><a href='create/'><button>Create Contest</button></a></span>
 <link href='{% static "contests/css/contest.css" %}' rel='stylesheet' type='text/css' />
-<div class="current">
-	<h1> CURRENT </h1>
-	{% if current %}
-		{% for contest in current %}
-			<a href='q/{{ contest.contest_code }}/'>
-				<div class="cont">
-					<h2>
-						{{contest.name}}
-					</h2><br>
-				</div>
-			</a><br><br>
+<br><hr><br>
+<div class="row container-fluid">
+	<div class="col-lg-4">
 
-		{% endfor %}
-	{% else %}
-		There is no contest going on right now.
-	{% endif %}
-</div>
-<br><br>
-<div class="upcoming">
-	<h1> UPCOMING</h1>
-	{% if upcoming %}
-		{% for contest in upcoming %}
-			
-			<a href="q/{{ contest.contest_code }}/">
-				<div class="cont">
-					<h2>
-						{{contest.name}}
-					</h2><br>
-				</div>
-			</a><br><br>
-		{% endfor %}
-	{% else %}
-		No upcoming Contests, yet.
-	{% endif %}
+		<div class="current">
+			<h1> CURRENT </h1>
+			{% if current %}
+				{% for contest in current %}
+					<a href='q/{{ contest.contest_code }}/'>
+						<div class="cont">
+							<h2>
+								{{contest.name}}
+							</h2><br>
+						</div>
+					</a><br><br>
+
+				{% endfor %}
+			{% else %}
+				There is no contest going on right now.
+			{% endif %}
+		</div>
+	</div>
+	<div class="col-lg-4">
+		<div class="upcoming">
+			<h1> UPCOMING</h1>
+			{% if upcoming %}
+				{% for contest in upcoming %}
+
+					<a href="q/{{ contest.contest_code }}/">
+						<div class="cont">
+							<h2>
+								{{contest.name}}
+							</h2><br>
+						</div>
+					</a><br><br>
+				{% endfor %}
+			{% else %}
+				No upcoming Contests, yet.
+			{% endif %}
+		</div>
+	</div>
+	<div class="col-lg-4">
+		<div class="current">
+			<h1> User's Contests</h1>
+			{% if usrs_contest %}
+				{% for contest in usrs_contest %}
+
+					<a href="q/{{ contest.contest_code }}/">
+						<div class="cont">
+							<h2>
+								{{contest.name}}
+							</h2><br>
+						</div>
+					</a><br><br>
+				{% endfor %}
+			{% else %}
+				No Contests, yet.
+			{% endif %}
+		</div>
+	</div>
 </div>
 {% endblock %}
