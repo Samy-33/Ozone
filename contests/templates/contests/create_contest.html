@@ -4,7 +4,7 @@
 {% block content %}
 	<link href='{% static "contests/css/create.css" %}' rel='stylesheet' type='text/css' />
 	Welcome {{ request.user.username }}, You can create your own contest here.
-	{% if 'done' in request.POST %}
+	{% if done %}
 		Contest has been made, waiting for approval.
 	{% elif request.user.profile.tobecon == 1 %}
 		You have already created the contest
@@ -12,12 +12,16 @@
 	<br><br>
 	<div class="container">
 <!--		<table>-->
+		<table>
 			<form method='post'>
 				{% csrf_token %}
-				{{ form.as_p }}
-				<input type="hidden" name="done" value=1 />
-				<input type="submit" value='Create' />
+				{% for field in form %}
+					<tr><td>{{field.errors.as_text}}</td><td></td></tr>
+					<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}</td></tr>
+				{% endfor %}
+				<tr><td><input type="submit" value='Create' /></td></tr>
 			</form>
+		</table>
 <!--		</table> -->
 	</div>
 	{% endif %}

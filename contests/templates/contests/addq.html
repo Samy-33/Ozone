@@ -2,9 +2,14 @@
 
 {% block content %}
 	<center> <h2>New Question</h2></center><br><br>
-	<form method=post>
-		{% csrf_token %}
-		{{form.as_p}}
-		<input type=submit  value="Add" />
-	</form>
+	<table>
+		<form method=post>
+			{% csrf_token %}
+			{% for field in form %}
+				<tr><td>{{field.errors.as_text}}</td><td></td></tr>
+				<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}</td></tr>
+			{% endfor %}
+			<tr><td><input type=submit  value="Add" /></td></tr>
+		</form>
+	</table>
 {% endblock %}

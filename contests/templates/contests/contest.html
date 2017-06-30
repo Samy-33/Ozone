@@ -6,7 +6,7 @@
 		<p> You can't edit this contest. Sorry for inconvinience caused.</p>
 	{% endif %}
 	{% if contest.admin == request.user %}
-		<p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit</button></a></span></p>
+		<p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit Contest</button></a></span></p>
 	{% endif %}
 	{% if pp and request.user != contest.admin %}
 		Contest is still to start

@@ -13,7 +13,6 @@ class Contest(models.Model):
 	start_date = models.DateTimeField(null=False, blank=False)
 	end_date = models.DateTimeField(null=False, blank=False)
 	allowed = models.IntegerField(default=0, blank=False, null=False)
-#	duration = models.TimeField(null=False, blank=False)
 	def __str__(self):
 		return "Admin: %s\nname: %s\ncontest_code: %s\nallowed: %s\n"%(self.admin.username, self.name, self.contest_code, str(self.allowed))
 	
