@@ -1,0 +1,10 @@
+table{
+	border-collapse:separate; 
+	border-spacing:1em;
+}
+th{
+	float:left;
+}
+td{
+	margin-left:20px;
+}
