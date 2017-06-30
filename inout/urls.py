@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
-
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 app_name = 'inout'
@@ -19,3 +19,5 @@ urlpatterns = [
 	url(r'profyl/allow/$', views.allow, name='allow'),
 	#url(r'', views.)
 ]
+
+#urlpatterns += 	patterns()

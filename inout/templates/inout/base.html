@@ -1,11 +1,13 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 {% load static %}
 <html>
 	<head>
 		<title> Welcome to Ozone Judge </title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src='{% static "inout/js/jquery.js" %}' type=text/javascript> </script>
+		<link href='{% static "inout/css/base.css" %}'  type='text/css' rel='stylesheet' />
 		<link href='{% static "inout/css/bootstrap.min.css" %}' rel='stylesheet' type='text/css' />
-		<link href='{% static "inout/css/base.css" %}' rel=stylesheet type='text/css' />
 		<style>
 			body{
 				margin-left:30px;

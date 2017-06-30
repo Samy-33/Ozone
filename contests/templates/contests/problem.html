@@ -1,7 +1,31 @@
 {% extends 'inout/base.html' %}
 {% load static %}
 {% block content %}
+	<script src="{% static 'contests/js/check_code.js' %}" type="text/javascript"></script>
 	<link href="{% static 'contests/css/contest.css' %}" rel=stylesheet type="text/css" />
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var div = document.getElementById('editor');
+			var code = document.createElement('textarea');
+			code.name = 'code';
+			code.maxLength = "5000";
+			code.cols = "50";
+			code.rows = "20";
+			code.id = "editcode";
+			var lang = document.createElement('select');
+			lang.name = "lang";
+			lang.id = "lang";
+			lang.options.add( new Option("C", "c", true, true));
+			lang.options.add( new Option("C++", "cpp"));
+			lang.options.add( new Option("python2.7", "python2"));
+			lang.options.add( new Option("python3.5", "python3"));
+			lang.options.add( new Option("Java", "java"));
+			div.appendChild(lang);
+			div.innerHTML += "<br><br>";
+			div.appendChild(code);
+		});
+
+	</script>
 	<center><h1>{{ques.name}}</h1><br><b>{{contest.contest_code}}</b>:{{ques.code}}</center><br>
 	<dl>
 		<dt>
@@ -9,8 +33,17 @@
 			Statement:
 		</h3></dt>
 		<dd>
-			<pre>{{ques.text}}</pre>
+			<div class="wrapper container">
+			<div class="row"><pre>{{ques.text}}</pre></div></div>
 		</dd><br><br>
-		<b><i>Time Limit:</i></b>{{ques.time_lim}}
+		<b><i>Time Limit:</i></b><p>{{ques.time_lim}}</p><br><br>
+		
 	</dl>
+	<center><div id="editor"></div>
+		{% csrf_token %}
+	<button onclick="submit('{{ques.code}}', '{{csrf_token}}');">Submit</button><hr><br></center><br>
+<hr>
+
+	<div id="result"></div>
+<hr><br><br>
 {% endblock %}

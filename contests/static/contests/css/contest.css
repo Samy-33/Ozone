@@ -2,19 +2,25 @@
 	border: solid 1px black;
 	width:40%;
 	background-color:aliceblue;
-	padding:20px;
+	padding-left:10px;
+	padding-bottom:10px;
 }
 
 .current{
 	border: solid 1px black;
 	width:40%;
 	background-color: aquamarine;
-	padding:20px;
+	padding-left:10px;
+	padding-bottom:10px;
+}
+
+a .cont{
+	margin-left:30px;
 }
 
 dl{
-	margin-left:10px;
-	margin-bottom:20px;
+	margin-left:20px;
+	margin-bottom:5px;
 }
 
 dd{

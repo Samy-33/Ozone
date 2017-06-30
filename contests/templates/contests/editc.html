@@ -1,18 +1,28 @@
 {% extends 'inout/base.html' %}
 {% load static %}
 {% block content %}
-
+	<style>
+		td{
+			width:15em;
+			padding:5px;
+			border:None;
+			text-align: center;
+		}
+	</style>
 
 	{% if not contest %}
 		<p>You can't edit this contest</p>
 	{% else %}
-		{% for ques in contest.problem %}
-			<div class="ques">
-				<h2>{{ques.name}}</h2><br>
-				<a href="/contests/q/edit/{{contest.contest_code}}/{{ques.code}}/"><button>Edit</button></a>
-			</div>
-			<br><br>
-		{% endfor %}
-		<a href="/contests/q/edit/{{contest.contest_code}}/a/"><button>Add New Question</button></a>
+	
+		<a href="/contests/q/edit/{{contest.contest_code}}/a/"><button>Add New Question</button></a><br><br>
+		<table class="table table-bordered"><tbody>
+			{% for prob in contest.problem_set.all %}
+				<tr>
+					<td><a href="/contests/q/{{contest.contest_code}}/p/{{prob.code}}/">{{prob.code}}</a></td>
+					<td><a href="/contests/q/edit/{{contest.contest_code}}/p/{{prob.code}}/"><button>Edit</button></a></td>
+				</tr>
+
+			{% endfor %}
+		</tbody></table>
 	{% endif %}
 {% endblock %}
