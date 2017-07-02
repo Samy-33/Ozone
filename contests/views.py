@@ -117,6 +117,7 @@ def addq(request, code):
 				pb.save()
 				
 				for file in request.FILES:
+#					print(file)
 					with open(os.path.join(path, file), "w") as f:
 						for kk in request.FILES[file].readlines():
 							f.write(str(kk))
@@ -125,8 +126,9 @@ def addq(request, code):
 				
 				return redirect('/contests/q/%s/'%code)
 			else:
-				return render(request, 'contests/', {'form':form})
+				return render(request, 'contests/addq.html', {'form':form})
 		except Exception as e:
+#			print(e)
 			return render(request, 'contests/addq.html', {'form':Prob(initial={})})
 	return render(request, 'contests/addq.html', {'form':Prob(initial={})})
 
@@ -156,19 +158,42 @@ def submit(request, code):
 			"""
 			## This is compiling the code
 			"""
+			
+			## Separate Code for Python
+			if 'python' in request.POST.get('lang'):
+				run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(codepath, \
+																								  os.path.join(path_for_tests, 'in%d.txt'%i), \
+																								   os.path.join(path_for_problem, 'uout%d.txt'%i)))
+				try:
+					res = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT)
+					retcode = check(request.user, q.code, i)
+					removeDir(request, code)
+					if(retcode==1):
+						res = res.split()[1]
+						res = res.split('s')[0]
+						return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
+					elif(retcode==0):
+						return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%(i+1)})
+					else:
+						return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
+				except sb.CalledProcessError as e:
+					removeDir(request, code)
+					if("status 124" not in str(e)):
+						retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+						return JsonResponse({'status':'compile_error', 'error':retdata})
+					return JsonResponse({'status':'unknown_error', 'error':str(e)})
+				
 			try:
 				compile_cmd = cmds[request.POST.get('lang')][0]
 				if(request.POST.get('lang') in ['c', 'cpp']):
 					compile_cmd = compile_cmd%(codepath, outputpath)
 				else:
 					compile_cmd = compile_cmd%(codepath)
-				compile_cmd = "timeout 2s "+compile_cmd
 				## Not secure
 				sb.check_output(compile_cmd.strip(), shell=True, stderr=sb.STDOUT)
-				
 			except sb.CalledProcessError as e:
+				removeDir(request, code)
 				if("status 124" not in str(e)):
-					removeDir(request, code)
 					retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
 					return JsonResponse({'status':'compile_error', 'error':retdata})
 			"""
@@ -188,7 +213,7 @@ def submit(request, code):
 					res = res.split('s')[0]
 					return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
 				elif(retcode==0):
-					return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%i})
+					return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%(i+1)})
 				else:
 					return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
 			except sb.CalledProcessError as e:
@@ -196,7 +221,8 @@ def submit(request, code):
 					removeDir(request, code)
 					return JsonResponse({"status":"time_limit_exceeded", "error":"TLE %s"%(q.time_lim)})
 				if("status 1" in str(e)):
-					removeDir(request, code)
+#					removeDir(request, code)
+#					print(e)
 					return JsonResponse({"status":"run_time_error", "error":"Run Time Error"})
 	removeDir(request, code)
 	return HttpResponse("Still to add this code, going to be long. I guess.")
