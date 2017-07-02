@@ -25,3 +25,19 @@ class Problem(models.Model):
 	text = models.CharField(max_length=10000, blank=False, null=False)
 	n_testfiles = models.IntegerField(default=0, blank=False, null=False)
 	time_lim = models.FloatField(default=1.0, blank=False, null=False)
+	score = models.IntegerField(default = 0)
+
+class Solve(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
+	time = models.DateTimeField(auto_now = True)
+
+class Ranking(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+	wa = models.IntegerField(default=0)
+	ac = models.IntegerField(default=0)
+	score = models.IntegerField(default=0)
+
+
+	

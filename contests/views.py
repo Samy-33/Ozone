@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import Contest, Problem
+from .models import Contest, Problem, Solve, Ranking
 from inout.global_vars import *
 import datetime
 from django.db.models import Q
@@ -108,13 +108,14 @@ def addq(request, code):
 					name = form.cleaned_data['name'],
 					code = form.cleaned_data['code'],
 					text = form.cleaned_data['text'],
-					time_lim = form.cleaned_data['time_lim']
+					time_lim = form.cleaned_data['time_lim'],
+					score = form.cleaned_data['score'],
+					n_testfiles = form.cleaned_data['n_testfiles'],
 				)
 				import os
 				pt = os.getcwd()
 				path = os.path.join(pt, "tmp/problems/%s"%(pb.code))
 				os.makedirs(path)
-				pb.save()
 				
 				for file in request.FILES:
 #					print(file)
@@ -142,8 +143,8 @@ def addq(request, code):
 @login_required(login_url="/")
 def submit(request, code):
 	if(request.method == 'POST'):
+		tim = 0.0
 		q = get_object_or_404(Problem, code=code)
-
 		import os
 		path_for_problem = os.path.join(os.getcwd(), "tmp/%s/%s"%(request.user.username, code))
 		if(not os.path.exists(path_for_problem)):
@@ -154,11 +155,28 @@ def submit(request, code):
 		
 		with open(codepath, "w") as file:
 			file.write(request.POST.get('code'))
-		for i in range(0, q.n_testfiles+1):
+		
+		for i in range(0, q.n_testfiles):
 			"""
 			## This is compiling the code
 			"""
-			
+			if 'python' not in request.POST.get('lang'):
+				try:
+					compile_cmd = cmds[request.POST.get('lang')][0]
+					if(request.POST.get('lang') in ['c', 'cpp']):
+						compile_cmd = compile_cmd%(codepath, outputpath)
+					else:
+						compile_cmd = compile_cmd%(codepath)
+					## Not secure
+					sb.check_output(compile_cmd.strip(), shell=True, stderr=sb.STDOUT)
+				except sb.CalledProcessError as e:
+					removeDir(request, code)
+					if("status 124" not in str(e)):
+						retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+						return JsonResponse({'status':'compile_error', 'error':retdata})
+				"""
+				## Ending the compilation process If successful, move on to run the code and output
+				"""
 			## Separate Code for Python
 			if 'python' in request.POST.get('lang'):
 				run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(codepath, \
@@ -167,14 +185,21 @@ def submit(request, code):
 				try:
 					res = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT)
 					retcode = check(request.user, q.code, i)
-					removeDir(request, code)
 					if(retcode==1):
-						res = res.split()[1]
-						res = res.split('s')[0]
-						return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
+#						print res
+						res = res.split()[2]
+						res = res.split('e')[0].split(":")[1]
+						tim = max(tim, float(res))
+#						return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
 					elif(retcode==0):
+						removeDir(request, code)
+						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+							addWA(request, q)
 						return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%(i+1)})
 					else:
+						removeDir(request, code)
+						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+							addWA(request, q)
 						return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
 				except sb.CalledProcessError as e:
 					removeDir(request, code)
@@ -182,50 +207,45 @@ def submit(request, code):
 						retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
 						return JsonResponse({'status':'compile_error', 'error':retdata})
 					return JsonResponse({'status':'unknown_error', 'error':str(e)})
-				
-			try:
-				compile_cmd = cmds[request.POST.get('lang')][0]
-				if(request.POST.get('lang') in ['c', 'cpp']):
-					compile_cmd = compile_cmd%(codepath, outputpath)
-				else:
-					compile_cmd = compile_cmd%(codepath)
-				## Not secure
-				sb.check_output(compile_cmd.strip(), shell=True, stderr=sb.STDOUT)
-			except sb.CalledProcessError as e:
-				removeDir(request, code)
-				if("status 124" not in str(e)):
-					retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
-					return JsonResponse({'status':'compile_error', 'error':retdata})
-			"""
-			## Ending the compilation process If successful, move on to run the code and output
-			"""
-			try:
-				run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(outputpath, \
-																								  os.path.join(path_for_tests, 'in%d.txt'%i), \
-																								  os.path.join(path_for_problem, 'uout%d.txt'%i)))
-				### Not Secure
-				res = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT)
-					
-				retcode = check(request.user, q.code, i)
-				removeDir(request, code)
-				if(retcode==1):
-					res = res.split()[1]
-					res = res.split('s')[0]
-					return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
-				elif(retcode==0):
-					return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%(i+1)})
-				else:
-					return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
-			except sb.CalledProcessError as e:
-				if("status 124" in str(e)):
-					removeDir(request, code)
-					return JsonResponse({"status":"time_limit_exceeded", "error":"TLE %s"%(q.time_lim)})
-				if("status 1" in str(e)):
-#					removeDir(request, code)
-#					print(e)
-					return JsonResponse({"status":"run_time_error", "error":"Run Time Error"})
-	removeDir(request, code)
-	return HttpResponse("Still to add this code, going to be long. I guess.")
+			else:
+				try:
+					run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(outputpath, \
+																									  os.path.join(path_for_tests, 'in%d.txt'%i), \
+																									  os.path.join(path_for_problem, 'uout%d.txt'%i)))
+					### Not Secure
+					res = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT)
+
+					retcode = check(request.user, q.code, i)
+					if(retcode==1):
+#						print res
+						res = res.split()[2]
+						res = res.split('e')[0].split(":")[1]
+#						print(res)
+						tim = max(tim, float(res))
+	#					return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
+					elif(retcode==0):
+						removeDir(request, code)
+						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+							addWA(request, q)
+						return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%(i+1)})
+					else:
+						removeDir(request, code)
+						return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
+				except sb.CalledProcessError as e:
+					if("status 124" in str(e)):
+						removeDir(request, code)
+						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+							addWA(request, q)
+						return JsonResponse({"status":"time_limit_exceeded", "error":"TLE %s"%(q.time_lim)})
+					if("status 1" in str(e)):
+	#					removeDir(request, code)
+	#					print(e)
+						return JsonResponse({"status":"run_time_error", "error":"Run Time Error"})
+		removeDir(request, code)
+		if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+			addAC(request, q)
+		return JsonResponse({"status":"Accepted", "error":"time take => %f"%tim})
+	return  JsonResponse({'status':'No testcases', "error":"can't find any testcase for this problem"})
 
 
 def removeDir(request, code):
@@ -244,14 +264,40 @@ def check(user, problem, n):
 		while c1 != "" or c2 != "":
 			c1 = user_output.readline().strip()
 			c2 = exp_output.readline().strip()
+#			print("c1==> "+c1)
+#			print("c2==> "+c2)
+#			print("-----------------")
 			if(c1 != c2):
 				return 0
 		return 1
 	except Exception as e:
 		return 2
 		
+def already(user, q):
+	return Solve.objects.filter(Q(problem=q)&Q(user=user)).exists()
 
+def addAC(request, q):
+	Solve.objects.create(user=request.user, problem=q)
+	try:
+		p = Ranking.objects.get(user=request.user, contest=q.contest)
+		p.ac += 1
+		p.score += q.score
+		p.save()
+	except:
+		p = Ranking.objects.create(user=request.user, contest=q.contest)
+		p.ac = 1
+		p.score += q.score
+		p.save()
 
+def addWA(request, q):
+	try:
+		p = Ranking.objects.get(user=request.user, contest=q.contest)
+		p.wa += 1
+		p.save()
+	except:
+		p = Ranking.objects.create(user=request.user, contest=q.contest)
+		p.wa = 1
+		p.save()
 """
 
 ## Here is the end of Submission check view and related functions
@@ -273,3 +319,14 @@ def deleteq(request, code):
 	else:
 		raise Http404
 	return HttpResponse("Done")
+
+
+
+def rankings(request, contest):
+	con = get_object_or_404(Contest, contest_code=contest)
+	if(con.start_date <= aware(datetime.datetime.now())):
+#		data = Ranking.objects.filter(Q(contest=con)).extra(select={'order':"5*ac-wa"}).extra(order_by=['order'])
+		data = Ranking.objects.filter(Q(contest=con)).order_by('-score')
+		return render(request, 'contests/ranking.html', {'con':data})
+	else:
+		return render(request, 'contests/ranking.html', {'con':[]})

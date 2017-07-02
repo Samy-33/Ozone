@@ -138,55 +138,130 @@ def code_edit(request):
 	if request.method == 'POST':
 		form = CodeForm(request.POST)
 
-		print(str(request.POST.get('inpt')))
-		lng = str(request.POST.get('language'))
-		ext = extensions[lng]
-		directory = "tmp/%s"%(request.user.username)
-		filename="%s/fil%s"%(directory, ext)
-		inp = "%s/in"%(directory)
-		with open(filename, "w") as fil:
-			fil.write(str(request.POST.get('code')))
-			
-		if('python' not in lng):
+		
+		lang = request.POST.get('language')
+		code_path = os.path.join(os.getcwd(), "tmp/%s/code%s"%(request.user.username, extensions[lang]))
+		input_file = os.path.join(os.getcwd(), "tmp/%s/inp.txt"%(request.user.username))
+		with open(code_path, "w") as file:
+			file.write(request.POST.get('code'))
+		with open(input_file, "w") as file:
+			file.write(request.POST.get('inpt'))
+		if('python' in lang):
+			run_cmd = "timeout 5s "+(cmd[lang][1]%(code_path, input_file))
 			try:
-				check_output(cmd[lng][1]%(filename, "%s/a.out"%(directory)), shell=True, stderr=STDOUT)
-				os.system("chmod u+rx %s"%filename)
+				ps = check_output(run_cmd, shell=True, stderr=STDOUT)
+				return HttpResponse(ps)
 			except CalledProcessError as e:
-				e = e.output.split("\n")
-				e = "<br>".join(e)
-				e = e.split(" ")
-				e = "&nbsp".join(e)
-				os.system("rm %s"%(filename))
-				return HttpResponse("<pre>%s</pre>"%e)
-			try:
-				#Change here so that file runs on each testcase (loop)
-				with open(inp, "w") as fil:
-					fil.write(str(request.POST.get('inpt')))
-				p=check_output(cmd[lng][1]%("%s/a.out"%(directory), inp), shell=True, stderr=STDOUT)
-				os.system("rm %s"%filename)
-				os.system("rm %s"%(inp))
-				os.system("rm %s"%(directory+"/a.out"))
-			except CalledProcessError as e:
-				e = e.output
-				return HttpResponse("<pre>%s</pre>"%e)
-			else:
-				return HttpResponse("<pre>%s</pre>"%p)
+				if("status 124" not in str(e)):
+					retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+					return HttpResponse(retdata)
+				elif("status 1" in str(e)):
+					return HttpResponse("Time Exceeded: 5.0s")
+				else:
+					return HttpResponse("Server Error")
 		else:
+			outpt = "a.out" if lang != "java" else '';
+			output_path = os.path.join(os.getcwd(), "tmp/%s/%s"%(request.user.username, outpt))
+			compile_cmd = cmd[lang][0]%(code_path, output_path) if lang !='java' else "javac tmp/%s/code.java"%(request.user.username)
 			try:
-				#Change here so that file runs on each testcase (loop)
-				with open(inp, "w") as fil:
-					fil.write(str(request.POST.get('inpt')))
-				p = check_output(cmd[lng][0]%(filename, inp), shell=True, stderr=STDOUT)
-				os.system("rm %s"%(inp))
-				os.system("rm %s"%filename)
+				ps = check_output(compile_cmd, shell=True, stderr=STDOUT)
+				run_cmd = "timeout 5s "+((cmd[lang][1]%(output_path, input_file)) if lang!='java' else "java -cp %s"%os.path.join(os.getcwd(),"tmp/%s Main"%request.user.username)) 
+				ps = check_output(run_cmd, shell=True, stderr=STDOUT)
+				return HttpResponse(ps)
 			except CalledProcessError as e:
-				e = e.output.split("\n")
-				e = "<br>".join(e)
-				e = e.split(" ")
-				e = "&nbsp".join(e)
-				return HttpResponse("<pre>%s</pre>"%e)
-			else:
-				return HttpResponse("<pre>%s</pre>"%p)
+				retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+				return HttpResponse(retdata)
+			
+#	else:
+#		return render(request, 'inout/code-edit.html', {'form':form})
+
+		
+		"""
+			if 'python' in request.POST.get('lang'):
+				run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(codepath, \
+																								  os.path.join(path_for_tests, 'in%d.txt'%i), \
+																								   os.path.join(path_for_problem, 'uout%d.txt'%i)))
+				try:
+					res = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT)
+					retcode = check(request.user, q.code, i)
+					if(retcode==1):
+#						print res
+						res = res.split()[2]
+						res = res.split('e')[0].split(":")[1]
+						tim = max(tim, float(res))
+#						return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
+					elif(retcode==0):
+						removeDir(request, code)
+						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+							addWA(request, q)
+						return JsonResponse({"status":"wrong_answer", "error":"WA in testcase %d"%(i+1)})
+					else:
+						removeDir(request, code)
+						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
+							addWA(request, q)
+						return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
+				except sb.CalledProcessError as e:
+					removeDir(request, code)
+					if("status 124" not in str(e)):
+						retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+						return JsonResponse({'status':'compile_error', 'error':retdata})
+					return JsonResponse({'status':'unknown_error', 'error':str(e)})
+		"""
+		
+		
+		
+		
+		
+		
+#		print(str(request.POST.get('inpt')))
+#		lng = str(request.POST.get('language'))
+#		ext = extensions[lng]
+#		directory = "tmp/%s"%(request.user.username)
+#		filename="%s/fil%s"%(directory, ext)
+#		inp = "%s/in"%(directory)
+#		with open(filename, "w") as fil:
+#			fil.write(str(request.POST.get('code')))
+#			
+#		if('python' not in lng):
+#			try:
+#				check_output(cmd[lng][1]%(filename, "%s/a.out"%(directory)), shell=True, stderr=STDOUT)
+#				os.system("chmod u+rx %s"%filename)
+#			except CalledProcessError as e:
+#				e = e.output.split("\n")
+#				e = "<br>".join(e)
+#				e = e.split(" ")
+#				e = "&nbsp".join(e)
+#				os.system("rm %s"%(filename))
+#				return HttpResponse("<pre>%s</pre>"%e)
+#			try:
+#				#Change here so that file runs on each testcase (loop)
+#				with open(inp, "w") as fil:
+#					fil.write(str(request.POST.get('inpt')))
+#				p=check_output(cmd[lng][1]%("%s/a.out"%(directory), inp), shell=True, stderr=STDOUT)
+#				os.system("rm %s"%filename)
+#				os.system("rm %s"%(inp))
+#				os.system("rm %s"%(directory+"/a.out"))
+#			except CalledProcessError as e:
+#				e = e.output
+#				return HttpResponse("<pre>%s</pre>"%e)
+#			else:
+#				return HttpResponse("<pre>%s</pre>"%p)
+#		else:
+#			try:
+#				#Change here so that file runs on each testcase (loop)
+#				with open(inp, "w") as fil:
+#					fil.write(str(request.POST.get('inpt')))
+#				p = check_output(cmd[lng][1]%(filename, inp), shell=True, stderr=STDOUT)
+#				os.system("rm %s"%(inp))
+#				os.system("rm %s"%filename)
+#			except CalledProcessError as e:
+#				e = e.output.split("\n")
+#				e = "<br>".join(e)
+#				e = e.split(" ")
+#				e = "&nbsp".join(e)
+#				return HttpResponse("<pre>%s</pre>"%e)
+#			else:
+#				return HttpResponse("<pre>%s</pre>"%p)
 
 	else: return render(request, 'inout/code-edit.html', {'form':form})
 

@@ -8,6 +8,10 @@
 	{% if contest.admin == request.user %}
 		<p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit Contest</button></a></span></p>
 	{% endif %}
+	{% if not pp %}
+		<br><button class="btn btn-default" style="float:left;"><a href="/contests/q/{{contest.contest_code}}/rankings/">Ranking</a></button> 
+		<br><br><hr>
+	{% endif %}
 	{% if pp and request.user != contest.admin %}
 		Contest is still to start
 	{% else %}

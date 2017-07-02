@@ -44,5 +44,6 @@ languages = (
 	
 class CodeForm(forms.Form):
 	language=forms.ChoiceField(choices=languages, required=True)
-	code = forms.CharField(widget=forms.Textarea(attrs={'required':'False', 'max_length':1500, 'class':"code"}), label=_("Code"))
+	code = forms.CharField(widget=forms.Textarea(attrs={'max_length':5000, 'class':"code"}), label=_("Code"))
 	inpt = forms.CharField(widget=forms.Textarea(attrs={'max_length':100, 'class':"input"}), label=_("Input"))
+	

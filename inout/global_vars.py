@@ -15,11 +15,11 @@ output = {
 }
 
 cmd = {
-	'cpp':("g++ %s -o %s", "./%s < %s"),
-	'c':("gcc %s -o %s", "./%s < %s"),
+	'cpp':("g++ %s -o %s", "%s < %s"),
+	'c':("gcc %s -o %s", "%s < %s"),
 	'python2':('python %s', 'python %s < %s'),
 	'python3':('python3 %s','python3 %s < %s'),
-	'java':('javac %s', 'java %s < %s'),
+	'java':('javac %s', 'java Main.java < %s'),
 }
 
 

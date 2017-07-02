@@ -13,5 +13,6 @@ urlpatterns = [
 	url(r'^q/edit/(?P<code>[a-zA-Z0-9]{4,15})/a/$', views.addq, name="problem_add"),
 	url(r'^q/submit/(?P<code>[a-zA-Z0-9]{3,15})/$', views.submit, name="submit"),
 	url(r'^q/delete/(?P<code>[a-zA-Z0-9]{3,15})/$', views.deleteq, name="deleteq"),
+	url(r'^q/(?P<contest>[a-zA-Z0-9]{4,15})/rankings/$', views.rankings, name="rankings")
 
 ]
