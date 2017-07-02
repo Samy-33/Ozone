@@ -42,7 +42,7 @@ class Prob(forms.ModelForm):
 	text = forms.CharField(widget=forms.Textarea)
 	class Meta:
 		model = Problem
-		fields=['code', 'name', 'time_lim', 'text']
+		fields=['code', 'name', 'n_testfiles', 'time_lim', 'text']
 	
 	def clean_code(self):
 		try:
