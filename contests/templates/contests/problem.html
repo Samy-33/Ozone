@@ -41,9 +41,8 @@
 	</dl>
 	<center><div id="editor"></div>
 		{% csrf_token %}
-	<button onclick="submit('{{ques.code}}');">Submit</button><hr><br></center><br>
-<hr>
+	<button onclick="submit('{{ques.code}}', '{% static 'contests/images/submit.gif' %}');">Submit</button><hr><br></center><br>
 
 	<div id="result"></div>
-<hr><br><br>
+<hr><br>
 {% endblock %}

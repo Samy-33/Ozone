@@ -16,7 +16,7 @@
 			<form method='post'>
 				{% csrf_token %}
 				{% for field in form %}
-					<tr><td>{{field.errors.as_text}}</td><td></td></tr>
+					<tr><td></td><td>{{field.errors.as_text}}</td></tr>
 					<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}</td></tr>
 				{% endfor %}
 				<tr><td><input type="submit" value='Create' /></td></tr>
