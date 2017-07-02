@@ -12,22 +12,8 @@ from django.core import serializers
 import os, json
 from subprocess import *
 
+from .global_vars import *
 
-extensions = {
-	'cpp':".cpp",
-	'c':'.c',
-	'python2':'.py',
-	'python3':'.py',
-	'java':'.java',
-}
-
-cmd = {
-	'cpp':("g++ %s -o %s", "./%s < %s"),
-	'c':("gcc %s -o %s", "./%s < %s"),
-	'python2':('python %s < %s', 'python %s < %s'),
-	'python3':('python3 %s < %s','python3 %s < %s'),
-	'java':('javac %s', 'java %s < %s'),
-}
 
 
 
@@ -163,7 +149,7 @@ def code_edit(request):
 			
 		if('python' not in lng):
 			try:
-				check_output(cmd[lng][0]%(filename, "%s/a.out"%(directory)), shell=True, stderr=STDOUT)
+				check_output(cmd[lng][1]%(filename, "%s/a.out"%(directory)), shell=True, stderr=STDOUT)
 				os.system("chmod u+rx %s"%filename)
 			except CalledProcessError as e:
 				e = e.output.split("\n")

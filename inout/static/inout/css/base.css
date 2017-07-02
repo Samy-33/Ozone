@@ -2,9 +2,10 @@ table{
 	border-collapse:separate; 
 	border-spacing:1em;
 }
-th{
-	float:left;
+.table.no-border tr td, .table.no-border tr th {
+  border-width: 0;
 }
-td{
-	margin-left:20px;
+
+.btn{
+	width:10em;
 }
