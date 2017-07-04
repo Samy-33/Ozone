@@ -3,6 +3,24 @@
 {% block content %}
 <center>
 	<table class="table table-bordered">
+		<caption style="color:green;"><center><h2> {{contest.name}} </h2></center></caption>
+		<thead>
+			<tr>
+				<th>
+					Standing
+				</th>
+				<th>
+					User Name
+				</th>
+				<th>
+					Score
+				</th>
+				<th>
+					Submissions
+				</th>
+			</tr>
+		
+		</thead>
 		<tbody>
 		{% if con %}
 			{% for u in con %}

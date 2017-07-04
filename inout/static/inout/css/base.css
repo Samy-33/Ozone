@@ -1,7 +1,3 @@
-table{
-	border-collapse:separate; 
-	border-spacing:1em;
-}
 .table.no-border tr td, .table.no-border tr th {
   border-width: 0;
 }

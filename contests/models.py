@@ -7,9 +7,9 @@ from django.contrib.auth.models import User
 
 
 class Contest(models.Model):
-	admin = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+	admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	name = models.CharField(max_length=30, blank=False, null=False)
-	contest_code = models.CharField(max_length=10, unique=True, blank=False)
+	contest_code = models.CharField(max_length=10, primary_key=True, unique=True, blank=False)
 	start_date = models.DateTimeField(null=False, blank=False)
 	end_date = models.DateTimeField(null=False, blank=False)
 	allowed = models.IntegerField(default=0, blank=False, null=False)

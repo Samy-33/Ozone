@@ -34,7 +34,21 @@ def index(request):
 @login_required(login_url='/')
 def create(request):
 	if(request.method == 'POST'):
-		form = CreateContest(request.POST)
+#		print(request.POST)
+		rq = request.POST
+#		print(type(rq.get('start_date')))
+		form = CreateContest(rq)
+#		print(type(rq.get('start_date_0')))
+#		start_date = request.POST.get('start_date_0')+" "+request.POST.get('start_date_1')
+#		end_date = request.POST.get('end_date_0')+" "+request.POST.get('end_date_1')
+#		print(start_date)
+#		print(end_date)
+#		form = CreateContest({'contest_code' : rq.get('contest_code'),
+#							 'name' : rq.get('name'),
+#							  'start_date' : start_date,
+#							  'end_date' : end_date
+#				})
+	
 		if(form.is_valid()):
 			c = Contest.objects.create(
 				admin = request.user,
@@ -51,6 +65,8 @@ def create(request):
 			
 			return render(request, 'contests/create_contest.html', {'form':form, 'done':True})
 		else:
+			
+#			print(form.errors)
 			return render(request, 'contests/create_contest.html', {'form':form, 'done':False})
 	else:
 		form = CreateContest(initial={})
@@ -143,6 +159,10 @@ def addq(request, code):
 @login_required(login_url="/")
 def submit(request, code):
 	if(request.method == 'POST'):
+#		form=Prob(request.POST)
+		from inout.views import is_alright
+		if(not is_alright(request.POST.get('code'), request.POST.get('lang'))):
+			return JsonResponse({"status":"Code execution failure", "Error":"Invalid Code."})
 		tim = 0.0
 		q = get_object_or_404(Problem, code=code)
 		import os
@@ -152,21 +172,22 @@ def submit(request, code):
 		path_for_tests = os.path.join(os.getcwd(), "tmp/problems/%s"%(code))
 		codepath = os.path.join(path_for_problem, "code%s"%(extensions[request.POST.get('lang')]))
 		outputpath = os.path.join(path_for_problem, output[request.POST.get('lang')])
-		
+
 		with open(codepath, "w") as file:
 			file.write(request.POST.get('code'))
-		
+
 		for i in range(0, q.n_testfiles):
 			"""
 			## This is compiling the code
 			"""
 			if 'python' not in request.POST.get('lang'):
 				try:
-					compile_cmd = cmds[request.POST.get('lang')][0]
-					if(request.POST.get('lang') in ['c', 'cpp']):
-						compile_cmd = compile_cmd%(codepath, outputpath)
-					else:
-						compile_cmd = compile_cmd%(codepath)
+#					compile_cmd = cmds[request.POST.get('lang')][0]
+					compile_cmd = cmds[request.POST.get('lang')][0]%(codepath, outputpath) if request.POST.get('lang') !='java' else "javac tmp/%s/%s/code.java"%(request.user.username, q.code)
+#					if(request.POST.get('lang') in ['c', 'cpp']):
+#						compile_cmd = compile_cmd%(codepath, outputpath)
+#					else:
+#						compile_cmd = compile_cmd%(codepath)
 					## Not secure
 					sb.check_output(compile_cmd.strip(), shell=True, stderr=sb.STDOUT)
 				except sb.CalledProcessError as e:
@@ -209,6 +230,9 @@ def submit(request, code):
 					return JsonResponse({'status':'unknown_error', 'error':str(e)})
 			else:
 				try:
+#					print(request.POST.get('lang'))
+					if(request.POST.get('lang') == 'java'):
+						outputpath = "tmp/%s/%s Main"%(request.user.username, q.code)
 					run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(outputpath, \
 																									  os.path.join(path_for_tests, 'in%d.txt'%i), \
 																									  os.path.join(path_for_problem, 'uout%d.txt'%i)))
@@ -232,6 +256,7 @@ def submit(request, code):
 						removeDir(request, code)
 						return JsonResponse({"status":"System_error", "error":"Results can't be matched properly"})
 				except sb.CalledProcessError as e:
+					print(e)
 					if("status 124" in str(e)):
 						removeDir(request, code)
 						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
@@ -245,6 +270,7 @@ def submit(request, code):
 		if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
 			addAC(request, q)
 		return JsonResponse({"status":"Accepted", "error":"time take => %f"%tim})
+
 	return  JsonResponse({'status':'No testcases', "error":"can't find any testcase for this problem"})
 
 
@@ -286,16 +312,18 @@ def addAC(request, q):
 	except:
 		p = Ranking.objects.create(user=request.user, contest=q.contest)
 		p.ac = 1
-		p.score += q.score
+		p.score = q.score
 		p.save()
 
 def addWA(request, q):
 	try:
 		p = Ranking.objects.get(user=request.user, contest=q.contest)
+		p.score -= 5
 		p.wa += 1
 		p.save()
 	except:
 		p = Ranking.objects.create(user=request.user, contest=q.contest)
+		p.score = -5
 		p.wa = 1
 		p.save()
 """
@@ -327,6 +355,17 @@ def rankings(request, contest):
 	if(con.start_date <= aware(datetime.datetime.now())):
 #		data = Ranking.objects.filter(Q(contest=con)).extra(select={'order':"5*ac-wa"}).extra(order_by=['order'])
 		data = Ranking.objects.filter(Q(contest=con)).order_by('-score')
-		return render(request, 'contests/ranking.html', {'con':data})
+		return render(request, 'contests/ranking.html', {'con':data, 'contest':con})
 	else:
-		return render(request, 'contests/ranking.html', {'con':[]})
+		return render(request, 'contests/ranking.html', {'con':[], 'contest':con})
+	
+	
+def deletec(request, contest):
+	con = get_object_or_404(Contest, contest_code=contest)
+	
+	if(con.start_date >= aware(datetime.datetime.now())):
+		request.user.profile.tobecon = False
+		request.user.profile.save()
+		con.delete()
+		return JsonResponse({'done':'Yes, Did that.'}, status=200)
+	return JsonResponse({'done':'Nope cant do that'}, status=200)
