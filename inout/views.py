@@ -3,7 +3,7 @@ from .forms import *
 from django.http import HttpResponse, JsonResponse		
 from django.shortcuts import render, redirect
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required#, csrf.csrf_protect
+from django.contrib.auth.decorators import login_required
 from inout.models import Profile
 from contests.models import Contest, Problem
 import random, socks, time
@@ -76,8 +76,6 @@ def activate(request):
 						u.is_active = True
 						u.activation_code = ""
 						u.save()
-#						st = "tmp/%s"%(request.POST.get('usr'))
-#						os.mkdir(st)
 						return redirect('/')
 				return render(request, 'inout/activate.html', {'form':form})
 			else:

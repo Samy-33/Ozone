@@ -34,20 +34,8 @@ def index(request):
 @login_required(login_url='/')
 def create(request):
 	if(request.method == 'POST'):
-#		print(request.POST)
 		rq = request.POST
-#		print(type(rq.get('start_date')))
-		form = CreateContest(rq)
-#		print(type(rq.get('start_date_0')))
-#		start_date = request.POST.get('start_date_0')+" "+request.POST.get('start_date_1')
-#		end_date = request.POST.get('end_date_0')+" "+request.POST.get('end_date_1')
-#		print(start_date)
-#		print(end_date)
-#		form = CreateContest({'contest_code' : rq.get('contest_code'),
-#							 'name' : rq.get('name'),
-#							  'start_date' : start_date,
-#							  'end_date' : end_date
-#				})
+		form = CreateContest(request.POST)
 	
 		if(form.is_valid()):
 			c = Contest.objects.create(
@@ -65,8 +53,6 @@ def create(request):
 			
 			return render(request, 'contests/create_contest.html', {'form':form, 'done':True})
 		else:
-			
-#			print(form.errors)
 			return render(request, 'contests/create_contest.html', {'form':form, 'done':False})
 	else:
 		form = CreateContest(initial={})
@@ -134,7 +120,6 @@ def addq(request, code):
 				os.makedirs(path)
 				
 				for file in request.FILES:
-#					print(file)
 					with open(os.path.join(path, file), "w") as f:
 						for kk in request.FILES[file].readlines():
 							f.write(str(kk))
@@ -145,7 +130,6 @@ def addq(request, code):
 			else:
 				return render(request, 'contests/addq.html', {'form':form})
 		except Exception as e:
-#			print(e)
 			return render(request, 'contests/addq.html', {'form':Prob(initial={})})
 	return render(request, 'contests/addq.html', {'form':Prob(initial={})})
 
@@ -159,7 +143,6 @@ def addq(request, code):
 @login_required(login_url="/")
 def submit(request, code):
 	if(request.method == 'POST'):
-#		form=Prob(request.POST)
 		from inout.views import is_alright
 		if(not is_alright(request.POST.get('code'), request.POST.get('lang'))):
 			return JsonResponse({"status":"Code execution failure", "Error":"Invalid Code."})
@@ -182,12 +165,7 @@ def submit(request, code):
 			"""
 			if 'python' not in request.POST.get('lang'):
 				try:
-#					compile_cmd = cmds[request.POST.get('lang')][0]
 					compile_cmd = cmds[request.POST.get('lang')][0]%(codepath, outputpath) if request.POST.get('lang') !='java' else "javac tmp/%s/%s/code.java"%(request.user.username, q.code)
-#					if(request.POST.get('lang') in ['c', 'cpp']):
-#						compile_cmd = compile_cmd%(codepath, outputpath)
-#					else:
-#						compile_cmd = compile_cmd%(codepath)
 					## Not secure
 					sb.check_output(compile_cmd.strip(), shell=True, stderr=sb.STDOUT)
 				except sb.CalledProcessError as e:
@@ -207,11 +185,9 @@ def submit(request, code):
 					res = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT)
 					retcode = check(request.user, q.code, i)
 					if(retcode==1):
-#						print res
 						res = res.split()[2]
 						res = res.split('e')[0].split(":")[1]
 						tim = max(tim, float(res))
-#						return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
 					elif(retcode==0):
 						removeDir(request, code)
 						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
@@ -230,7 +206,6 @@ def submit(request, code):
 					return JsonResponse({'status':'unknown_error', 'error':str(e)})
 			else:
 				try:
-#					print(request.POST.get('lang'))
 					if(request.POST.get('lang') == 'java'):
 						outputpath = "tmp/%s/%s Main"%(request.user.username, q.code)
 					run_cmd = "timeout "+str(q.time_lim)+"s time "+(cmds[request.POST.get('lang')][1]%(outputpath, \
@@ -241,12 +216,9 @@ def submit(request, code):
 
 					retcode = check(request.user, q.code, i)
 					if(retcode==1):
-#						print res
 						res = res.split()[2]
 						res = res.split('e')[0].split(":")[1]
-#						print(res)
 						tim = max(tim, float(res))
-	#					return JsonResponse({"status":"accepted", "error":"Time Taken:"+res+"s"})
 					elif(retcode==0):
 						removeDir(request, code)
 						if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
@@ -263,8 +235,7 @@ def submit(request, code):
 							addWA(request, q)
 						return JsonResponse({"status":"time_limit_exceeded", "error":"TLE %s"%(q.time_lim)})
 					if("status 1" in str(e)):
-	#					removeDir(request, code)
-	#					print(e)
+						removeDir(request, code)
 						return JsonResponse({"status":"run_time_error", "error":"Run Time Error"})
 		removeDir(request, code)
 		if((not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user):
@@ -290,9 +261,6 @@ def check(user, problem, n):
 		while c1 != "" or c2 != "":
 			c1 = user_output.readline().strip()
 			c2 = exp_output.readline().strip()
-#			print("c1==> "+c1)
-#			print("c2==> "+c2)
-#			print("-----------------")
 			if(c1 != c2):
 				return 0
 		return 1
@@ -353,7 +321,6 @@ def deleteq(request, code):
 def rankings(request, contest):
 	con = get_object_or_404(Contest, contest_code=contest)
 	if(con.start_date <= aware(datetime.datetime.now())):
-#		data = Ranking.objects.filter(Q(contest=con)).extra(select={'order':"5*ac-wa"}).extra(order_by=['order'])
 		data = Ranking.objects.filter(Q(contest=con)).order_by('-score')
 		return render(request, 'contests/ranking.html', {'con':data, 'contest':con})
 	else:

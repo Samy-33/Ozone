@@ -46,9 +46,6 @@ function submit(problem, src){
 	var code = document.getElementById("editcode").value;
 	var lang = document.getElementById("lang").value;
 	src = "<center><img src='"+src+"'></img></center>";
-//	alert(src);
 	document.getElementById("result").innerHTML = src;
-//	t0 = performance.now();
 	req(problem, code, lang);
-//	alert(performance.now()-t0);
 }
