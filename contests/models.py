@@ -39,5 +39,26 @@ class Ranking(models.Model):
 	ac = models.IntegerField(default=0)
 	score = models.IntegerField(default=0)
 
-
+class CommentC(models.Model):
+	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	text = models.CharField(max_length=20, default='')
+	timestamp = models.DateTimeField(auto_now=True)
 	
+class CommentQ(models.Model):
+	problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	text = models.CharField(max_length=20, default='')
+	timestamp = models.DateTimeField(auto_now=True)
+
+class ConvC(models.Model):
+	comment = models.ForeignKey(CommentC, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	text = models.CharField(max_length=500, default='')
+	timestamp = models.DateTimeField(auto_now=True)
+	
+class ConvQ(models.Model):
+	comment = models.ForeignKey(CommentQ, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	text = models.CharField(max_length=500, default='')
+	timestamp = models.DateTimeField(auto_now=True)

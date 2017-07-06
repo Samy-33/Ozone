@@ -1,0 +1,40 @@
+{% extends 'inout/base.html' %}
+{% load static %}
+{% block content %}
+	<script src="{% static 'contests/js/javascript.js' %}" type="text/javascript"></script>
+	<h2><center><a href="{% url 'contests:contest' code=con.contest_code %}">{{con.name}}</a></center></h2><br>
+
+
+	<div id="forrm">
+{% csrf_token %}<button id="showform" class="btn btn-primary" onclick="showForm();">Add Comment</button></div>
+	<br><hr>
+	{% if comments %}
+		<table class="table table-bordered">
+			<thead><tr><th>Comment</th><th>Made By</th><th>Date/Time</th></tr></thead>
+			<tbody>
+				{% for comment in comments %}
+					<tr>
+						<th><a href="{% url 'contests:convC' code=con.contest_code pk=comment.id %}">{{comment.text}}</a></th>
+						<th><a href="{% url 'inout:profile' username=request.user.username %}">{{request.user.username}}</a></th>
+						<th>{{comment.timestamp}}</th>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<div class="pagination">
+			<span class="step-links">
+				{% if comments.has_previous %}
+					<a href="?page={{comments.previous_page_number}}">previous</a>
+				{% endif %}
+				<span class="current">
+					Page {{comments.number}} of {{comments.paginator.num_pages}}
+				</span>
+				{% if comments.has_next %}
+					<a href="?page={{comments.next_page_number}}">next</a>
+				{% endif %}
+			</span>
+		</div>
+	{% else %}
+		No data to show.
+	{% endif %}
+{% endblock %}

@@ -1,17 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import Contest, Problem, Solve, Ranking
-from inout.global_vars import *
-import datetime
-from django.db.models import Q
-from .forms import *
-from django.contrib.auth.models import User
-import pytz
 from django.views.decorators.csrf import csrf_protect
+from django.db.models import Q
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import (Contest, Problem,
+					 Solve, Ranking,
+					 CommentQ, CommentC,
+					 ConvC, ConvQ,
+					)
+from inout.global_vars import *
+from .forms import *
 from inout.global_func import aware
 from time import sleep
+import datetime
+import pytz
 import subprocess as sb
+
 
 @login_required(login_url='/')
 def index(request):
@@ -300,7 +306,7 @@ def addWA(request, q):
 
 """
 
-
+@login_required(login_url='/')
 def deleteq(request, code):
 	q = get_object_or_404(Problem, code=code)
 	
@@ -317,7 +323,7 @@ def deleteq(request, code):
 	return HttpResponse("Done")
 
 
-
+@login_required(login_url='/')
 def rankings(request, contest):
 	con = get_object_or_404(Contest, contest_code=contest)
 	if(con.start_date <= aware(datetime.datetime.now())):
@@ -325,8 +331,10 @@ def rankings(request, contest):
 		return render(request, 'contests/ranking.html', {'con':data, 'contest':con})
 	else:
 		return render(request, 'contests/ranking.html', {'con':[], 'contest':con})
+
 	
-	
+
+@login_required(login_url='/')
 def deletec(request, contest):
 	con = get_object_or_404(Contest, contest_code=contest)
 	
@@ -336,3 +344,85 @@ def deletec(request, contest):
 		con.delete()
 		return JsonResponse({'done':'Yes, Did that.'}, status=200)
 	return JsonResponse({'done':'Nope cant do that'}, status=200)
+
+
+@login_required(login_url='/')
+def boardC(request, contest):
+	con = get_object_or_404(Contest, contest_code=contest)
+	if(request.method=="POST"):
+		CommentC.objects.create(
+			contest=con,
+			user=request.user,
+			text = request.POST.get('com'),
+		)
+	comments_list = CommentC.objects.filter(Q(contest=con)).order_by("-timestamp")
+	paginator = Paginator(comments_list, 10)
+	page = request.GET.get('page')
+	try:
+		comments = paginator.page(page)
+	except:
+		comments = paginator.page(1)
+	
+	return render(request, 'contests/discussionC.html', {'comments':comments, 'con':con})
+	
+	
+@login_required(login_url='/')
+def boardQ(request, code):
+	prob = get_object_or_404(Problem, code=code)
+	if(request.method=="POST"):
+		CommentQ.objects.create(
+			problem=prob,
+			user=request.user,
+			text = request.POST.get('com'),
+		)
+	comments_list = CommentQ.objects.filter(Q(problem=prob)).order_by("-timestamp")
+	paginator = Paginator(comments_list, 10)
+	page = request.GET.get('page')
+	try:
+		comments = paginator.page(page)
+	except:
+		comments = paginator.page(1)
+		
+	return render(request, 'contests/discussionQ.html', {'comments':comments, 'prob':prob})
+
+
+@login_required(login_url='/')
+def convQ(request, question, pk):
+	main_comment = get_object_or_404(CommentQ, id=pk)
+	prob = get_object_or_404(Problem, code=question)
+	conversation_list = ConvQ.objects.filter(Q(comment=main_comment)).order_by('timestamp')
+	if(request.method=="POST"):
+		ConvQ.objects.create(
+			comment=main_comment,
+			user=request.user,
+			text=request.POST.get('com'),
+		)
+	paginator = Paginator(conversation_list, 10)
+	page = request.GET.get('page')
+	try:
+		conversations = paginator.page(page)
+	except:
+		conversations = paginator.page(1)
+	
+	return render(request, 'contests/convQ.html', {'conversations':conversations, 'prob':prob, 'main':main_comment})
+
+
+@login_required(login_url='/')
+def convC(request, code, pk):
+	main_comment = get_object_or_404(CommentC, id=pk)
+	con = get_object_or_404(Contest, contest_code=code)
+	conversation_list = ConvC.objects.filter(Q(comment=main_comment)).order_by('timestamp')
+	if(request.method=="POST"):
+		ConvC.objects.create(
+			comment=main_comment,
+			user=request.user,
+			text=request.POST.get('com'),
+		)
+	paginator = Paginator(conversation_list, 10)
+	page = request.GET.get('page')
+	try:
+		conversations = paginator.page(page)
+	except:
+		conversations = paginator.page(1)
+	
+	return render(request, 'contests/convC.html', {'conversations':conversations, 'con':con, 'main':main_comment})

@@ -59,3 +59,13 @@ function delCon(){
 	}
 }
 
+function showForm(){
+	var btn = document.getElementById("showform");
+	var ele = btn.parentElement;
+	ele.removeChild(btn);
+	str = ele.innerHTML;
+//	alert(ele.innerHTML);
+	html = "<form action='.' method=post>"+str+"Comment: <input type='textarea' name='com' required></input><input type=submit></input></form><br><hr>";
+	ele.innerHTML = html;
+}
+
