@@ -3,7 +3,7 @@ Ozone is the OnlineJudge for **PDPM Indian Institute of Information Technology, 
 
 ## Requirements  
 Python2.7  
-Django==1.9  
+Django==1.11  
 And additional requirements are in *requirments.txt*  
 
 ## How to run it?  
