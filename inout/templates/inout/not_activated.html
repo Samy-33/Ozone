@@ -3,5 +3,5 @@
 	Not Activated
 {% block content %}
 	Please activate your account or your account will be deleted automatically in one hour. <br>
-	<a href="{{ url activate}}">Activate</a>
+	<a href="{% url 'inout:activate' %}">Activate</a>
 {% endblock %}

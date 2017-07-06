@@ -17,7 +17,7 @@
 						<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
 					{% endfor %}
 				</table>
-				<button type="submit" > Login </button> Or <a href="/register/">Register</a>
+				<button type="submit" > Login </button> Or <a href="{% url 'inout:register' %}">Register</a>
 			</form>
 		</center>
 	</body>

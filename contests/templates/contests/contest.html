@@ -9,7 +9,7 @@
 		<p><span><a style="float:left;" href="javascript:delCon()"><button class="btn btn-danger">Delete Contest</button></a></span></p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit Contest</button></a></span></p>
 	{% endif %}
 	{% if not pp %}
-<br><a href="/contests/q/{{contest.contest_code}}/rankings/"><button class="btn btn-default" style="float:left;">Ranking</button></a> 
+<br><a href="{% url 'contests:rankings' contest=contest.contest_name %}"><button class="btn btn-default" style="float:left;">Ranking</button></a> 
 		<br><br><hr>
 	{% endif %}<br><br>
 <center><h1 id="code" value={{contest.contest_code}}><u>{{contest.contest_code}}</u></h1></center>
@@ -26,7 +26,7 @@
 						<div class="ques">
 							<h4>
 								<td>
-									<a href="/contests/q/{{contest.contest_code}}/p/{{ques.code}}/">{{ques.name}}</a>
+									<a href="{% url 'contests:problem' code=contest.contest_code question=ques.code %}">{{ques.name}}</a>
 								</td>
 								<td>
 									{{ques.score}}

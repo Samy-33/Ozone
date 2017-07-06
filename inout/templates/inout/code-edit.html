@@ -1,13 +1,8 @@
 {% extends 'inout/base.html' %}
 {% load static %}
 {% block content %}
-<!--
-	<a href='{% url "inout:home" %}' style="float:left;">Home</a>
-	<center><a href='{%url "inout:profile" %}'>Profile</a> | <a href='{% url 'inout:code' %}'>Code</a>
-	<a href='{%url "inout:logout" %}' style="float:right;">Logout</a>
-	<br><br>
-	<hr>
---><style>
+
+<style>
 	.code{
 		width:400px;
 		height:300px;
@@ -20,7 +15,7 @@
 <link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
 	<h1> Execute the Code: <br></h1>
 <table>
-	<form action="/code/" method="post">
+	<form action="{% url 'inout:code' %}" method="post">
 		{% csrf_token %}
 		{% for field in form %}
 			<tr><th>{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>

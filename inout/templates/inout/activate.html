@@ -8,7 +8,7 @@
 		<hr><br>
 			{{user.username}}
 			<table>
-			<form method='post' action="/activate/">
+			<form method='post' action="{% url 'inout:activate' %}">
 				{% csrf_token %}
 					{% for field in form %}
 						<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>

@@ -1,7 +1,7 @@
 
 from .forms import *
 from django.http import HttpResponse, JsonResponse		
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from inout.models import Profile
@@ -24,7 +24,7 @@ def clogin(request):
 		else:
 			return redirect("/activate/")
 	else:
-		return auth_views.login(request, "inout/login.html")
+		return auth_views.LoginView.as_view(template_name="inout/login.html")(request)
 
 def register(request):
 	form = RegistrationForm()
@@ -126,8 +126,9 @@ def allow(request):
 	
 	
 @login_required(login_url='/')
-def profile(request):
-	return render(request, "inout/profile.html")
+def profile(request, username):
+	u = get_object_or_404(User, username=username)
+	return render(request, "inout/profile.html", {'user':u})
 
 
 def is_alright(string, lang):
