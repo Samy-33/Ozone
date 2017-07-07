@@ -48,7 +48,7 @@ class CreateContest(forms.Form):
 			return self.cleaned_data['contest_code']
 	def clean_start_date(self):
 		now = aware(datetime.datetime.now())
-#		print(now, self.cleaned_data['start_date'])
+		print(now, self.cleaned_data['start_date'])
 		if(now>=self.cleaned_data['start_date']):
 			raise forms.ValidationError("Past dates are not allowed.")
 		return self.cleaned_data['start_date']

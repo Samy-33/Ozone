@@ -13,13 +13,14 @@ from .models import (Contest, Problem,
 from inout.global_vars import *
 from .forms import *
 from inout.global_func import aware
+from inout.views import is_activated
 from time import sleep
 import datetime
 import pytz
 import subprocess as sb
 
 
-@login_required(login_url='/')
+@is_activated
 def index(request):
 
 	try:
@@ -37,7 +38,7 @@ def index(request):
 	return render(request, 'contests/contests.html', {'upcoming':upcoming, 'current':current, 'usrs_contest':usrs_contest})
 
 
-@login_required(login_url='/')
+@is_activated
 def create(request):
 	if(request.method == 'POST'):
 		rq = request.POST
@@ -65,7 +66,7 @@ def create(request):
 		return render(request, 'contests/create_contest.html', {'form':form, 'done':False})
 
 
-@login_required(login_url="/")
+@is_activated
 def contest(request, code):
 	con = get_object_or_404(Contest, Q(contest_code=code))
 
@@ -77,7 +78,7 @@ def contest(request, code):
 	return render(request, 'contests/contest.html', {'contest':con, 'pp':pp})
 
 
-@login_required(login_url="/")
+@is_activated
 def editc(request, code):
 	con = get_object_or_404(Contest, Q(contest_code=code)&Q(end_date__gte=datetime.datetime.now()))
 
@@ -88,22 +89,21 @@ def editc(request, code):
 	return render(request, 'contests/editc.html', {'contest':False})
 
 
-@login_required(login_url="/")
+@is_activated
 def editq(request, code, question):
 	if(request.method=="POST"):
 		pass
 	return HttpResponse("Well, going to add it, soon")
 
 
-@login_required(login_url="/")
+@is_activated
 def problem(request, code, question):
 	con = get_object_or_404(Contest, contest_code=code)
 	ques = get_object_or_404(Problem, code=question)
 	return render(request, 'contests/problem.html', {'contest':con, 'ques':ques})
 
 
-
-@login_required(login_url="/")
+@is_activated
 def addq(request, code):
 	if(request.method=="POST"):
 		try:
@@ -146,7 +146,7 @@ def addq(request, code):
 
 
 @csrf_protect
-@login_required(login_url="/")
+@is_activated
 def submit(request, code):
 	if(request.method == 'POST'):
 		from inout.views import is_alright
@@ -306,7 +306,7 @@ def addWA(request, q):
 
 """
 
-@login_required(login_url='/')
+@is_activated
 def deleteq(request, code):
 	q = get_object_or_404(Problem, code=code)
 	
@@ -323,7 +323,7 @@ def deleteq(request, code):
 	return HttpResponse("Done")
 
 
-@login_required(login_url='/')
+@is_activated
 def rankings(request, contest):
 	con = get_object_or_404(Contest, contest_code=contest)
 	if(con.start_date <= aware(datetime.datetime.now())):
@@ -334,7 +334,7 @@ def rankings(request, contest):
 
 	
 
-@login_required(login_url='/')
+@is_activated
 def deletec(request, contest):
 	con = get_object_or_404(Contest, contest_code=contest)
 	
@@ -346,7 +346,7 @@ def deletec(request, contest):
 	return JsonResponse({'done':'Nope cant do that'}, status=200)
 
 
-@login_required(login_url='/')
+@is_activated
 def boardC(request, contest):
 	con = get_object_or_404(Contest, contest_code=contest)
 	if(request.method=="POST"):
@@ -366,7 +366,7 @@ def boardC(request, contest):
 	return render(request, 'contests/discussionC.html', {'comments':comments, 'con':con})
 	
 	
-@login_required(login_url='/')
+@is_activated
 def boardQ(request, code):
 	prob = get_object_or_404(Problem, code=code)
 	if(request.method=="POST"):
@@ -386,7 +386,7 @@ def boardQ(request, code):
 	return render(request, 'contests/discussionQ.html', {'comments':comments, 'prob':prob})
 
 
-@login_required(login_url='/')
+@is_activated
 def convQ(request, question, pk):
 	main_comment = get_object_or_404(CommentQ, id=pk)
 	prob = get_object_or_404(Problem, code=question)
@@ -407,7 +407,7 @@ def convQ(request, question, pk):
 	return render(request, 'contests/convQ.html', {'conversations':conversations, 'prob':prob, 'main':main_comment})
 
 
-@login_required(login_url='/')
+@is_activated
 def convC(request, code, pk):
 	main_comment = get_object_or_404(CommentC, id=pk)
 	con = get_object_or_404(Contest, contest_code=code)

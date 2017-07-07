@@ -13,9 +13,14 @@
 <script type="text/javascript" src='{% static "inout/js/javascript.js" %}'></script>
 <div class='header'>
 </div>
-<h1>{{user.username}}</h1><br><br>
+<h1 style="color:{{ user.profile.color }};">{{user.username}}</h1><br>
+<h3><b>Rating:{{ user.profile.rating }}</b></h3>
 {% if request.user.is_staff or request.user.is_superuser %}
 	<button onclick='getCon()' >Contests</button><br><br>
 	<div id="cons"></div>
 {% endif %}
+
+
+
+
 {% endblock %}

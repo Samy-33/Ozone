@@ -9,6 +9,7 @@ from contests.models import Contest, Problem
 import random, socks, time
 from django.core.mail import send_mail
 from django.core import serializers
+from django import forms
 import os, json
 from subprocess import *
 
@@ -16,6 +17,13 @@ from .global_vars import *
 
 
 
+def is_activated(f):
+	@login_required(login_url='/')
+	def wrapper(*args, **kwargs):
+		if(args[0].user.profile.activated):
+			return f(*args, **kwargs)
+		return redirect('inout:activate')
+	return wrapper
 
 def clogin(request):
 	if request.user.is_authenticated():
@@ -36,20 +44,17 @@ def register(request):
 			u = User.objects.create_user(
 				username = form.cleaned_data['username'],
 				password = form.cleaned_data['password1'],
-				is_active = False,
 				first_name = form.cleaned_data['fname'],
 				last_name = form.cleaned_data['lname'],
 			)
-			u.save()
 			code = ""
 			for i in range(6):
 				code += chr(random.randrange(48, 122))
-			p = Profile.objects.get(user=u)
-			p.birth = form.cleaned_data['dob']
-			p.activation_code = code
+			u.profile.birth = form.cleaned_data['dob']
+			u.profile.activation_code = code
 			print(code)
-			p.rating = 1500
-			p.save()
+			u.profile.rating = 1500
+			u.profile.save()
 
 #			send_mail("Activation Code", "This is your activation Code: %s"%code, '<sender mail address>', [list of all the recipients])
 			##Email the user
@@ -61,32 +66,34 @@ def register(request):
 	else:
 		return render(request, 'inout/register.html', {'form':form})
 	
-
 def activate(request):
-	form = None
 	try:
-		if(request.method == "POST"):
-			form = ActivateForm(request.POST)
-			if(not request.user.is_active):
+		if not request.user.profile.activated:
+			if(request.method == "POST"):
+				form = ActivateForm(request.POST)
 				if form.is_valid():
-					cd = User.objects.get(username=request.POST.get('usr')).profile.activation_code
+					cd = request.user.profile.activation_code
 					print(cd)
 					if(form.cleaned_data['act_code'] == cd):
-						u = User.objects.get(username=request.POST.get('usr'))
-						u.is_active = True
+						u = request.user
+						u.profile.activated = True
 						u.activation_code = ""
+						u.profile.save()
 						u.save()
 						return redirect('/')
-				return render(request, 'inout/activate.html', {'form':form})
+				error = "Invalid Code, contact admin if you didn't get the code."
+				return render(request, 'inout/activate.html', {'form':form, 'error':error})
 			else:
-				return redirect('/')
+				return render(request, 'inout/activate.html', {'form':ActivateForm(initial={})})
 		else:
 			return redirect('/')
-	except:
-		return redirect('/')
+	except Exception as e:
+		print(e)
+		return redirect('/logout/')
 	
 	
-@login_required(login_url="/")
+#@login_required(login_url="/")
+@is_activated
 def index(request):
 	return render(request, "inout/home.html")
 
@@ -104,7 +111,7 @@ def give_contests(request):
 		return JsonResponse({'status':'failure'}, status=404)
 	
 
-@login_required(login_url="/")
+@is_activated
 def allow(request):
 	try:
 		if(request.method == 'GET'):
@@ -125,7 +132,7 @@ def allow(request):
 		return JsonResponse({'done':'false'}, status=400)
 	
 	
-@login_required(login_url='/')
+@is_activated
 def profile(request, username):
 	u = get_object_or_404(User, username=username)
 	return render(request, "inout/profile.html", {'user':u})
@@ -148,7 +155,7 @@ def is_alright(string, lang):
 		return False
 	return True
 
-@login_required(login_url='/')
+@is_activated
 def code_edit(request):
 	form = CodeForm(initial={})
 	if request.method == 'POST':

@@ -32,8 +32,6 @@ class RegistrationForm(forms.Form):
 class ActivateForm(forms.Form):
 	act_code = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=6)), label=_("Activation Code"))
 	
-
-	
 languages = (
 	('cpp', 'c++'),
 	('c', 'c'),

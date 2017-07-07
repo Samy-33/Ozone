@@ -24,7 +24,7 @@
 		<tbody>
 		{% if con %}
 			{% for u in con %}
-				<tr> <th>{{forloop.counter}}</th><td><a href="/profyl/">{{u.user.username}}</a></td>
+				<tr> <th>{{forloop.counter}}</th><td><a style="{{ u.user.profile.color }};" href="/profyl/">{{u.user.username}}</a></td>
 					<td>{{u.score}}</td>
 					<td>
 						AC: {{u.ac}} -- WA: {{u.wa}}

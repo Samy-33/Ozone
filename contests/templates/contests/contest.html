@@ -6,7 +6,8 @@
 		<p> You can't edit this contest. Sorry for inconvinience caused.</p>
 	{% endif %}
 		{% if contest.admin == request.user %}
-			<p><span><a style="float:left;" href="javascript:delCon()"><button class="btn btn-danger">Delete Contest</button></a></span></p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit Contest</button></a></span></p>
+			<p><span><a style="float:left;" href="javascript:delCon()"><button class="btn btn-danger">Delete Contest</button></a></span></p>
+			<p><span><a style="float:right;" href="/contests/q/edit/{{contest.contest_code}}/"><button>Edit Contest</button></a></span></p><br>
 		{% endif %}
 	{% if not pp %}
 		<br><a href="{% url 'contests:rankings' contest=contest.contest_code %}"><button class="btn btn-default" style="float:left;">Ranking</button></a> 
