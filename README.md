@@ -1,5 +1,5 @@
 ## Ozone  
-Ozone is the OnlineJudge for **PDPM Indian Institute of Information Technology, Design and Manufacturing Jabalpur** being developed in python2.7 and using django webframework version 1.11  
+Ozone is the OnlineJudge for **PDPM Indian Institute of Information Technology, Design and Manufacturing Jabalpur** being developed in python3.6 and using django webframework version 1.11  
 
 ## Requirements  
 Python3.6  
@@ -7,8 +7,9 @@ Django==1.11
 And additional requirements are in *requirments.txt*  
 
 ## How to run it?  
+Create a folder tmp/problems/ in root directory of the project.  
 I have not added the database. So *makemigrations* and *migrate* the database.  
-Create a *superuser* and login using the credentials. Or you can just register and to activate your account, you can find the *activation_code* in `User.objects.get(username="your username").profile.activation_code` and get started.  
+Create a *superuser* and login using the credentials. Or you can just register and to activate your account,  
 I have left a print statement, so it prints out activation code in terminal when a user registers. So find it there.  
   
 ## Work to be done  
@@ -22,3 +23,7 @@ I have left a print statement, so it prints out activation code in terminal when
 - [ ] Add Practice Feature  
 - [ ] Profile View  
 - [ ] Increase Content...
+
+## Contribution  
+Open an issue if you want to contribute for something that's not already in *issues*  
+Send a Pull Request anytime.  
