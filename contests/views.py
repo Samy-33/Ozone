@@ -36,7 +36,7 @@ def index(request):
 	except:
 		usrs_contest = []
 	try:
-		past_contests = Contests.objects.filter(Q(end_date__lt==datetime.datetime.now()))
+		past_contests = Contest.objects.filter(Q(end_date__lt=aware(datetime.datetime.now())))
 	except:
 		past_contests = []
 	return render(request, 'contests/contests.html', {'upcoming':upcoming, 'current':current,
@@ -250,7 +250,7 @@ def submit(request, code):
 						return JsonResponse({'status':'WA', 'error':f'WA in testcase {i+1}'})
 					else:
 						removeDir(request, code)
-						if (not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user:
+						if (not already(request.user, q)) and q.contest.end_date>aware(datetime.datetime.now()) and q.contest.admin != request.user:
 							addWA(request, q)
 
 						return JsonResponse({'status':'SE', 'error':f'Results can\'t be matched properly'})
@@ -260,7 +260,9 @@ def submit(request, code):
 					if "status 124" not in str(e):
 						retdata = "<pre>%s</pre>"%("<br>".join(e.output.decode('utf-8').split('\n')))
 						return JsonResponse({'status':'compile_error', 'error':retdata})
-					return JsonResponse({'status':'unknown_error', 'error':'unknow error'})
+					if (not already(request.user, q)) and q.contest.end_date>aware(datetime.datetime.now()) and q.contest.admin != request.user:
+						addWA(request, q)
+					return JsonResponse({'status':'TLE', 'error':'Time Limit Exceeded'})
 			else:
 				try:
 					if request.POST.get('lang') == 'java':
@@ -278,7 +280,7 @@ def submit(request, code):
 						
 					elif retcode==0:
 						removeDir(request, code)
-						if (not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user:
+						if (not already(request.user, q)) and q.contest.end_date>aware(datetime.datetime.now()) and q.contest.admin != request.user:
 							addWA(request, q)
 						return JsonResponse({'status':'WA', 'error':f'WA in testcase {i+1}'})
 					else:
@@ -288,15 +290,17 @@ def submit(request, code):
 				except sb.CalledProcessError as e:
 					if 'status 124' in str(e):
 						removeDir(request, code)
-						if (not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user:
+						if (not already(request.user, q)) and q.contest.end_date>saware(datetime.datetime.now()) and q.contest.admin != request.user:
 							addWA(request, q)
 						return JsonResponse({'status':'TLE', 'error':f'TLE {q.time_lim+0.1}'})
 					if 'status 1' in str(e):
 						removeDir(request, code)
 						return JsonResponse({'status':'RTE', 'error':'Run Time Error'})
 		removeDir(request, code)
-		if (not already(request.user, q)) and q.contest.start_date<=aware(datetime.datetime.now()) and q.contest.admin != request.user:
+		if (not already(request.user, q)) and q.contest.end_date>aware(datetime.datetime.now()) and q.contest.admin != request.user:
 			addAC(request, q)
+		if not already(request.user, q):
+			addSolve(request, q)
 		return JsonResponse({'status':'Accepted', 'error':f'Time Taken: {maximum_time_taken}'})
 
 	return  JsonResponse({'status':'No testcases', 'error':'can\'t find any testcase for this problem'})
@@ -327,8 +331,10 @@ def check(user, problem, n):
 def already(user, q):
 	return Solve.objects.filter(Q(problem=q)&Q(user=user)).exists()
 
-def addAC(request, q):
+def addSolve(request, q):
 	Solve.objects.create(user=request.user, problem=q)
+
+def addAC(request, q):
 	try:
 		p = Ranking.objects.get(user=request.user, contest=q.contest)
 		p.ac += 1

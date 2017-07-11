@@ -27,7 +27,7 @@
 		<tbody>
 		{% if con %}
 			{% for u in con %}
-				<tr> <th>{{forloop.counter}}</th><td><a style="color:{{ u.user.profile.color }}; font-weight:bold;" href="/profyl/">{{u.user.username}}</a></td>
+				<tr> <th>{{forloop.counter}}</th><td><a style="color:{{ u.user.profile.color }}; font-weight:bold;" href="{% url 'inout:profile' username=u.user.username %}">{{u.user.username}}</a></td>
 					<td>{{u.score}}</td>
 					<td>
 						{{u.effective_score}}

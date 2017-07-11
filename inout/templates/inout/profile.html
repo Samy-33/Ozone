@@ -19,6 +19,37 @@
 	<button onclick='getCon()' >Contests</button><br><br>
 	<div id="cons"></div>
 {% endif %}
+<div style='float:right;'>
+<table class='table table-bordered'>
+	<thead>
+	<th>Problem</th><th>Time</th>
+	</thead>
+	<tbody>
+		{% if solved %}
+			{% for prob in solved %}
+			<tr>
+			<th> <a style='color:green;' href="{% url 'contests:problem' code=prob.problem.contest.contest_code question=prob.problem.code %}">{{prob.problem.code}} </a></th>
+			<td>{{prob.time}}</td></tr>
+			{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				{% if solved.has_previous %}
+					<a href="?page={{solved.previous_page_number}}">previous</a>
+				{% endif %}
+				<span class="current">
+					Page {{solved.number}} of {{solved.paginator.num_pages}}
+				</span>
+				{% if solved.has_next %}
+					<a href="?page={{solved.next_page_number}}">next</a>
+				{% endif %}
+			</span>
+		</div>
+		{% else %}
+			No submissions.
+		{% endif %}
+	</tbody>
+</table>
+</div>
 
 
 

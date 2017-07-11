@@ -11,10 +11,10 @@ urlpatterns = [
 	url(r"home/$", views.index, name="home"),
 	url(r'register/$', views.register, name='register'),
 	url(r'activate/$', views.activate, name='activate'),
-	url(r'profyl/(?P<username>[a-zA-z0-9]{1,15})/$', views.profile, name='profile'),
+	url(r'profile/(?P<username>[a-zA-z0-9]{1,15})/$', views.profile, name='profile'),
 	url(r'code/$', views.code_edit, name='code'),
-	url(r'profyl/[a-zA-Z0-9]+/allowcons/$', views.give_contests, name='consal'),
-	url(r'profyl/[a-zA-Z0-9]+/allow/$', views.allow, name='allow'),
+	url(r'profile/[a-zA-Z0-9]+/allowcons/$', views.give_contests, name='consal'),
+	url(r'profile/[a-zA-Z0-9]+/allow/$', views.allow, name='allow'),
 	url(r'not_activated/$', views.not_activated, name='not_activated'),
 ]
 

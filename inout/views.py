@@ -4,8 +4,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from inout.models import Profile
-from contests.models import Contest, Problem
+from contests.models import Contest, Problem, Solve
 import random, socks, time
 from django.core.mail import send_mail
 from django.core import serializers
@@ -135,7 +136,14 @@ def allow(request):
 @is_activated
 def profile(request, username):
 	u = get_object_or_404(User, username=username)
-	return render(request, 'inout/profile.html', {'user':u})
+	solved_list = Solve.objects.filter(user=u).order_by('-time')
+	paginator=Paginator(solved_list, 10)
+	page=request.GET.get('page')
+	try:
+		solved = paginator.page(page)
+	except:
+		solved = paginator.page(1)
+	return render(request, 'inout/profile.html', {'user':u, 'solved':solved})
 
 
 def is_alright(string, lang):

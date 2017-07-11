@@ -65,4 +65,25 @@
 		</div>
 	</div>
 </div>
+<br><br>
+<div class="row container">
+	<div class="col-sm-4">
+		<h2>Past Contests</h2>
+			{% if past_contests %}
+				{% for contest in past_contests %}
+
+					<a href="q/{{ contest.contest_code }}/">
+						<div class="cont">
+							<h2>
+								{{contest.name}}
+							</h2><br>
+						</div>
+					</a><br><br>
+				{% endfor %}
+			{% else %}
+				No Contests, yet.
+			{% endif %}
+	</div>
+</div>
+<br><hr><br>
 {% endblock %}
