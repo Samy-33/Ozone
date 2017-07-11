@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -13,14 +12,22 @@ class Profile(models.Model):
 	rating = models.IntegerField(default=1200, blank=True, null=True)
 	tobecon = models.BooleanField(blank=False, null=False, default=False)
 	activated = models.BooleanField(blank=False, null=False, default=False)
+	
 	@property
 	def color(self):
-		if self.rating <= 1200: return 'grey'
-		elif self.rating <= 1400: return 'green'
-		elif self.rating <= 1700: return 'cyan'
-		elif self.rating <= 2000: return 'blue'
-		elif self.rating <= 2500: return 'magenta'
-		else: return 'red'
+
+		if self.rating <= 1200:
+			return 'grey'
+		elif self.rating <= 1400:
+			return 'green'
+		elif self.rating <= 1700:
+			return 'cyan'
+		elif self.rating <= 2000:
+			return 'blue'
+		elif self.rating <= 2500:
+			return 'magenta'
+		else:
+			return 'red'
 	
 	def __str__(self):
 		return self.user.username

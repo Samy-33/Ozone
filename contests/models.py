@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
 from datetime import datetime as dt
 from django.db import models
 from django.contrib.auth.models import User
-
-# Create your models here.
+from django.dispatch import receiver
 
 
 class Contest(models.Model):
@@ -14,7 +12,7 @@ class Contest(models.Model):
 	end_date = models.DateTimeField(null=False, blank=False)
 	allowed = models.IntegerField(default=0, blank=False, null=False)
 	def __str__(self):
-		return "Admin: %s\nname: %s\ncontest_code: %s\nallowed: %s\n"%(self.admin.username, self.name, self.contest_code, str(self.allowed))
+		return f'Admin: {self.admin.username}\nname: {self.name}\ncontest_code: {self.contest_code}\nallowed: {self.allowed}\n'
 	
 	
 class Problem(models.Model):
@@ -27,6 +25,18 @@ class Problem(models.Model):
 	time_lim = models.FloatField(default=1.0, blank=False, null=False)
 	score = models.IntegerField(default = 0)
 
+
+@receiver(models.signals.pre_delete, sender=Contest)
+def delete_data(sender, instance, **kwargs):
+	import os, shutil
+	for problem in instance.problem_set.all():
+		path_to_remove = os.path.join(os.getcwd(), f'tmp/problem/{problem.code}')
+		print(path_to_remove)
+		if os.path.exists(path_to_remove):
+			shutil.rmtree(path_to_remove)
+	
+	
+	
 class Solve(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
@@ -38,6 +48,10 @@ class Ranking(models.Model):
 	wa = models.IntegerField(default=0)
 	ac = models.IntegerField(default=0)
 	score = models.IntegerField(default=0)
+	
+	@property
+	def effective_score(self):
+		return self.score - 5*self.wa
 
 class CommentC(models.Model):
 	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)

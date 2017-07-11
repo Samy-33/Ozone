@@ -15,6 +15,7 @@ urlpatterns = [
 	url(r'code/$', views.code_edit, name='code'),
 	url(r'profyl/[a-zA-Z0-9]+/allowcons/$', views.give_contests, name='consal'),
 	url(r'profyl/[a-zA-Z0-9]+/allow/$', views.allow, name='allow'),
+	url(r'not_activated/$', views.not_activated, name='not_activated'),
 ]
 
 #urlpatterns += 	patterns()

@@ -28,16 +28,16 @@ def is_activated(f):
 def clogin(request):
 	if request.user.is_authenticated():
 		if(request.user.is_active):
-			return redirect("/home/")
+			return redirect('inout:home')
 		else:
-			return redirect("/activate/")
+			return redirect('inout:activate')
 	else:
-		return auth_views.LoginView.as_view(template_name="inout/login.html")(request)
+		return auth_views.LoginView.as_view(template_name='inout/login.html')(request)
 
 def register(request):
 	form = RegistrationForm()
 	if request.user.is_authenticated():
-		return redirect('/home/')
+		return redirect('inout:home')
 	elif request.method == 'POST':
 		form = RegistrationForm(request.POST)
 		if form.is_valid():
@@ -47,20 +47,20 @@ def register(request):
 				first_name = form.cleaned_data['fname'],
 				last_name = form.cleaned_data['lname'],
 			)
-			code = ""
+			code = ''
 			for i in range(6):
 				code += chr(random.randrange(48, 122))
 			u.profile.birth = form.cleaned_data['dob']
 			u.profile.activation_code = code
 			print(code)
-			u.profile.rating = 1500
+			u.profile.rating = 1200
 			u.profile.save()
 
 #			send_mail("Activation Code", "This is your activation Code: %s"%code, '<sender mail address>', [list of all the recipients])
 			##Email the user
 			usr = form.cleaned_data['username']
 			form = ActivateForm(initial={})
-			return render(request, 'inout/activate.html', {'usr':usr, 'form':form})
+			return redirect('inout:not_activated')
 		else:
 			return render(request, 'inout/register.html', {'form':form})
 	else:
@@ -69,19 +69,18 @@ def register(request):
 def activate(request):
 	try:
 		if not request.user.profile.activated:
-			if(request.method == "POST"):
+			if request.method == 'POST':
 				form = ActivateForm(request.POST)
 				if form.is_valid():
 					cd = request.user.profile.activation_code
-					print(cd)
 					if(form.cleaned_data['act_code'] == cd):
 						u = request.user
 						u.profile.activated = True
-						u.activation_code = ""
+						u.activation_code = ''
 						u.profile.save()
 						u.save()
 						return redirect('/')
-				error = "Invalid Code, contact admin if you didn't get the code."
+				error = 'Invalid Code, contact admin if you didn\'t get the code.'
 				return render(request, 'inout/activate.html', {'form':form, 'error':error})
 			else:
 				return render(request, 'inout/activate.html', {'form':ActivateForm(initial={})})
@@ -89,25 +88,27 @@ def activate(request):
 			return redirect('/')
 	except Exception as e:
 		print(e)
-		return redirect('/logout/')
+		return redirect('inout:logout')
 	
-	
-#@login_required(login_url="/")
+
+def not_activated(request):
+	return render(request, 'inout/not_activated.html')
+
+
 @is_activated
 def index(request):
-	return render(request, "inout/home.html")
+	return render(request, 'inout/home.html')
 
 @login_required(login_url='/')
 def give_contests(request):
 	try:
-		c = Contest.objects.filter(allowed=0)
-		if(len(c)==0):
+		contests = Contest.objects.filter(allowed=0)
+		if len(contests)==0:
 			return JsonResponse({'status':'failure'}, status=200)
-		contest_requests = serializers.serialize("json", c)
+		contest_requests = serializers.serialize('json', contests)
 		return HttpResponse(contest_requests, content_type='application/json')
 
 	except Exception as e:
-		print(str(e))
 		return JsonResponse({'status':'failure'}, status=404)
 	
 
@@ -116,9 +117,8 @@ def allow(request):
 	try:
 		if(request.method == 'GET'):
 			pp = int(request.GET.get('ag'))
-			print pp
 			c = Contest.objects.get(pk=request.GET.get('pk'))
-			if(pp == 1):
+			if pp == 1:
 				c.allowed = 1
 				c.save()
 				return JsonResponse({'done':'true'}, status=200)
@@ -129,29 +129,29 @@ def allow(request):
 				c.delete()
 				return JsonResponse({'done':'true'}, status=200)
 	except Exception as e:
-		return JsonResponse({'done':'false'}, status=400)
+		return JsonResponse({'done':'false'}, status=404)
 	
 	
 @is_activated
 def profile(request, username):
 	u = get_object_or_404(User, username=username)
-	return render(request, "inout/profile.html", {'user':u})
+	return render(request, 'inout/profile.html', {'user':u})
 
 
 def is_alright(string, lang):
 	string = string.lower()
 	
-	if('python' in lang):
-		if("system(" in string or "os.popen" in string):
+	if 'python' in lang:
+		if 'system(' in string or 'popen' in string:
 			return False
 		else:
 			return True
 	elif lang == 'java':
-		if(".getruntime(" in string or "processbuilder(" in string):
+		if '.getruntime(' in string or 'processbuilder(' in string:
 			return False
 		else:
 			return True
-	elif "subprocess" in string:
+	elif 'subprocess' in string:
 		return False
 	return True
 
@@ -163,21 +163,21 @@ def code_edit(request):
 		
 		lang = request.POST.get('language')
 		if not is_alright(str(request.POST.get('code')), lang):
-			return HttpResponse("Invalid Code")
-		code_path = os.path.join(os.getcwd(), "tmp/%s/code%s"%(request.user.username, extensions[lang]))
-		input_file = os.path.join(os.getcwd(), "tmp/%s/inp.txt"%(request.user.username))
-		with open(code_path, "w") as file:
+			return HttpResponse('Invalid Code')
+		code_path = os.path.join(os.getcwd(), f'tmp/{request.user.username}/code{extensions[lang]}')
+		input_file = os.path.join(os.getcwd(), f'tmp/{request.user.username}/inp.txt')
+		with open(code_path, 'w') as file:
 			file.write(request.POST.get('code'))
-		with open(input_file, "w") as file:
+		with open(input_file, 'w') as file:
 			file.write(request.POST.get('inpt'))
 		if('python' in lang):
-			run_cmd = "timeout 5s "+(cmd[lang][1]%(code_path, input_file))
+			run_cmd = 'timeout 5s {}'.format(cmd[lang][1]%(code_path, input_file))
 			try:
-				ps = check_output(run_cmd, shell=True, stderr=STDOUT)
+				ps = check_output(run_cmd, shell=True, stderr=STDOUT).decode('utf-8')
 				return HttpResponse(ps)
 			except CalledProcessError as e:
 				if("status 124" not in str(e)):
-					retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+					retdata = "<pre>{}</pre>".format("<br>".join(e.output.decode('utf-8').split("\n")))
 					return HttpResponse(retdata)
 				elif("status 1" in str(e)):
 					return HttpResponse("Time Exceeded: 5.0s")
@@ -185,16 +185,15 @@ def code_edit(request):
 					return HttpResponse("Server Error")
 		else:
 			outpt = "a.out" if lang != "java" else '';
-			output_path = os.path.join(os.getcwd(), "tmp/%s/%s"%(request.user.username, outpt))
-			compile_cmd = cmd[lang][0]%(code_path, output_path) if lang !='java' else "javac tmp/%s/code.java"%(request.user.username)
-			print("Compiled")
+			output_path = os.path.join(os.getcwd(), 'tmp/{}/{}'.format(request.user.username, outpt))
+			compile_cmd = cmd[lang][0]%(code_path, output_path) if lang !='java' else f'javac tmp/{request.user.username}/code.java'
 			try:
-				ps = check_output(compile_cmd, shell=True, stderr=STDOUT)
+				ps = check_output(compile_cmd, shell=True, stderr=STDOUT).decode('utf-8')
 				run_cmd = "timeout 5s "+((cmd[lang][1]%(output_path, input_file)) if lang!='java' else "java -cp %s < %s"%(os.path.join(os.getcwd(),"tmp/%s Main"%request.user.username), input_file)) 
 				ps = check_output(run_cmd, shell=True, stderr=STDOUT)
 				return HttpResponse(ps)
 			except CalledProcessError as e:
-				retdata = "<pre>%s</pre>"%("<br>".join(e.output.split("\n")))
+				retdata = "<pre>{}</pre>".format("<br>".join(e.output.decode('utf-8').split("\n")))
 				return HttpResponse(retdata)
 
 	else: return render(request, 'inout/code-edit.html', {'form':form})
