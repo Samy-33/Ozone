@@ -24,17 +24,6 @@ class Problem(models.Model):
 	n_testfiles = models.IntegerField(default=0, blank=False, null=False)
 	time_lim = models.FloatField(default=1.0, blank=False, null=False)
 	score = models.IntegerField(default = 0)
-
-
-@receiver(models.signals.pre_delete, sender=Contest)
-def delete_data(sender, instance, **kwargs):
-	import os, shutil
-	for problem in instance.problem_set.all():
-		path_to_remove = os.path.join(os.getcwd(), f'tmp/problem/{problem.code}')
-		print(path_to_remove)
-		if os.path.exists(path_to_remove):
-			shutil.rmtree(path_to_remove)
-	
 	
 	
 class Solve(models.Model):
