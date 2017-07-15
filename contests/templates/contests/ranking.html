@@ -27,15 +27,30 @@
 		<tbody>
 		{% if con %}
 			{% for u in con %}
-				<tr> <th>{{forloop.counter}}</th><td><a style="color:{{ u.user.profile.color }}; font-weight:bold;" href="{% url 'inout:profile' username=u.user.username %}">{{u.user.username}}</a></td>
+				<tr>
+					<th>
+						{{forloop.counter}}
+					</th>
+					<td>
+						<a style="color:{{ u.user.profile.color }}; font-weight:bold;" href="{% url 'inout:profile' username=u.user.username %}">
+							{{u.user.username}}
+						</a>
+					</td>
 					<td>{{u.score}}</td>
 					<td>
 						{{u.effective_score}}
 					</td>
 					<td>
-						<span style='color:green; font-weight:bold;'>Successful Submissions:</span> {{u.ac}}<br> <span style='color:red; font-weight:bold;'>Unsuccessful Submissions:</span> {{u.wa}}
+						<span style='color:green; font-weight:bold;'>
+							Successful Submissions:
+						</span>
+						{{u.ac}}
+						<br>
+						<span style='color:red; font-weight:bold;'>
+							Unsuccessful Submissions:
+						</span>
+						{{u.wa}}
 					</td>
-					
 				</tr>
 			{% endfor %}
 		{% else %}

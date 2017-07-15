@@ -34,7 +34,16 @@ function req(problem, code, lang){
 				$.ajaxSettings.beforeSend(xhr, settings);
 			},
 			success:function(data){
-				document.getElementById("result").innerHTML = data['status']+"<br>"+data['error'];
+				var div = document.getElementById("result");
+				color = 'green';
+				if(data['status']=='SE' || data['status']=='RTE'){
+					color = 'blue';
+				}
+				else if(data['status'] != 'Accepted'){
+					color = 'red';
+				}
+				div.setAttribute('style', `background-color:${color}; padding:10px;border:2px black solid; border-radius:4px;`);
+				div.innerHTML = `<p style='color:white; font-weight:bold; font-size:20px;'> ${data['status']}<br> ${data['error']}</p>`;
 //				console.log(data)
 			},
 			error:function(data){

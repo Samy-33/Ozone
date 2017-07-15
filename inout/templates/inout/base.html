@@ -21,11 +21,25 @@
 		<hr>
 		</center>
 		<a href='{% url "inout:home" %}' style="float:left; margin-left:20px;">Home</a>
-		<center><a href='/contests/'>Contests</a> | <a href="{%url 'inout:profile' username=request.user.username %}">Profile</a> | <a href="{% url 'inout:code' %}">Code</a> | <a href="{% url 'practice:index'%}">Practice</a>
-		<a href="{%url 'inout:logout' %}" style="float:right; margin-right:20px;">Logout</a>
-		<br>
-			<hr><br></center>
-		<b><h4><span><i class = "fa fa-hand-o-left"></i></span><span><a href="javascript:window.history.back();"> Go back</a></span></h4></b>
+		<center>
+			<a href='/contests/'>Contests</a> | 
+			<a href="{%url 'inout:profile' username=request.user.username %}">Profile</a> | 
+			<a href="{% url 'inout:code' %}">Code</a> | 
+			<a href="{% url 'practice:index'%}">Practice</a>
+			<a href="{%url 'inout:logout' %}" style="float:right; margin-right:20px;">Logout</a>
+			<br>
+			<hr><br>
+		</center>
+		<b>
+			<h4>
+				<span>
+					<i class = "fa fa-hand-o-left"></i>
+				</span>
+				<span>
+					<a href="javascript:window.history.back();"> Go back</a>
+				</span>
+			</h4>
+		</b>
 		{% block content %}
 		{% endblock %}
 	</body>

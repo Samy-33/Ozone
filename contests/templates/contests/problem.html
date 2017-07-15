@@ -40,10 +40,16 @@
 		<b><i>Time Limit:</i></b><p>{{ques.time_lim}}</p><br><br>
 		
 	</dl>
-	<center><div id="editor"></div>
+	<center>
+		<div id="editor"></div>
 		{% csrf_token %}
-	<button onclick="submit('{{ques.code}}', '{% static 'contests/images/submit.gif' %}');">Submit</button><hr><br></center><br>
+		<button onclick="submit('{{ques.code}}', '{% static 'contests/images/submit.svg' %}');">
+			Submit
+		</button>
+		<hr>
+		<br>
+	</center><br>
 
-	<div id="result"></div>
+		<div id="result"></div>
 <hr><br>
 {% endblock %}

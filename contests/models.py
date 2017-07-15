@@ -11,8 +11,10 @@ class Contest(models.Model):
 	start_date = models.DateTimeField(null=False, blank=False)
 	end_date = models.DateTimeField(null=False, blank=False)
 	allowed = models.IntegerField(default=0, blank=False, null=False)
+	
 	def __str__(self):
-		return f'Admin: {self.admin.username}\nname: {self.name}\ncontest_code: {self.contest_code}\nallowed: {self.allowed}\n'
+		return f'Admin: {self.admin.username}\nname: {self.name}\n'
+		'contest_code: {self.contest_code}\nallowed: {self.allowed}\n'
 	
 	
 class Problem(models.Model):

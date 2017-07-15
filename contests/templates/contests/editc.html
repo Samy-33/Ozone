@@ -22,8 +22,23 @@
 		<table class="table table-bordered"><tbody>
 			{% for prob in contest.problem_set.all %}
 				<tr>
-					<td><a href="/contests/q/{{contest.contest_code}}/p/{{prob.code}}/">{{prob.code}}</a></td>
-					<td><a href="/contests/q/edit/{{contest.contest_code}}/p/{{prob.code}}/"><button class="btn btn-primary">Edit</button></a></td><td><button class="btn btn-danger" onclick=del('{{prob.code}}'); >Delete</button></td>
+					<td>
+						<a href="{% url 'contests:problem' code=contest.contest_code question=prob.code%}">
+							{{prob.code}}
+						</a>
+					</td>
+					<td>
+						<a href="{% url 'contests:editq' code=contest.contest_code question=prob.code %}">
+							<button class="btn btn-primary">
+								Edit
+							</button>
+						</a>
+					</td>
+					<td>
+						<button class="btn btn-danger" onclick=del('{{prob.code}}'); >
+							Delete
+						</button>
+					</td>
 				</tr>
 
 			{% endfor %}

@@ -10,18 +10,44 @@
 			</center>
 		</h4>
 
-<div id="forrm">
-{% csrf_token %}<button id="showform" class="btn btn-primary" onclick="showForm();">Add Comment</button></div>
+	<div id="forrm">
+		{% csrf_token %}
+		<button id="showform" class="btn btn-primary" onclick="showForm();">
+			Add Comment
+		</button>
+	</div>
 	<br><hr>
 	{% if comments %}
 		<table class="table table-bordered">
-			<thead><tr><th>Comment</th><th>Made By</th><th>Date/Time</th></tr></thead>
+			<thead>
+				<tr>
+					<th>
+						Comment
+					</th>
+					<th>
+						Made By
+					</th>
+					<th>
+						Date/Time
+					</th>
+				</tr>
+			</thead>
 			<tbody>
 				{% for comment in comments %}
 					<tr>
-						<th><a href="{% url 'contests:convQ' question=prob.code pk=comment.id %}">{{comment.text}}</a></th>
-						<th><a href="{% url 'inout:profile' username=request.user.username %}">{{request.user.username}}</a></th>
-						<th>{{comment.timestamp}}</th>
+						<th>
+							<a href="{% url 'contests:convQ' question=prob.code pk=comment.id %}">
+								{{comment.text}}
+							</a>
+						</th>
+						<th>
+							<a href="{% url 'inout:profile' username=request.user.username %}">
+								{{request.user.username}}
+							</a>
+						</th>
+						<th>
+							{{comment.timestamp}}
+						</th>
 					</tr>
 				{% endfor %}
 				<div class="pagination">

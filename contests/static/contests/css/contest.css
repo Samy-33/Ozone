@@ -14,6 +14,11 @@
 	overflow-y:auto;
 }
 
+.cont{
+	margin:10px;
+	text-align: center;
+}
+
 
 dl{
 	margin-left:20px;

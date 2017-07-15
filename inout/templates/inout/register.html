@@ -7,16 +7,29 @@
 		<link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
-		<center><p style="color:blue; font-size:30px;"><a href='{% url "inout:home"%}' >Ozone</a><sup style="font-size:10px;">iiitdmj</sup></p>
-		<hr><br>
+		<center>
+			<p style="color:blue; font-size:30px;">
+				<a href='{% url "inout:home"%}' >
+					Ozone
+				</a>
+				<sup style="font-size:10px;">
+					iiitdmj
+				</sup>
+			</p>
+			<hr><br>
 			<h1>Register</h1>
 			<form method='post' action='{% url "inout:register"%}'>
-				
-
 				{% csrf_token %}
 				<table>
 					{% for field in form %}
-						<tr><th style="float:left;">{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
+						<tr>
+							<th style="float:left;">
+								{{field.label_tag}}
+							</th>
+							<td>
+								{{field}}{{field.errors}}
+							</td>
+						</tr>
 					{% endfor %}
 				</table>
 				<input type="submit" value="register"/> Or <a href='{% url 'inout:login' %}'>Login</a>

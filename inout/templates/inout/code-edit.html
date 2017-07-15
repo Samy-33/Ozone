@@ -2,26 +2,26 @@
 {% load static %}
 {% block content %}
 
-<style>
-	.code{
-		width:400px;
-		height:300px;
-	}
-	.input{
-		width:400px;
-		height:150px;
-	}
-</style>
-<link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
-	<h1> Execute the Code: <br></h1>
-<table>
-	<form action="{% url 'inout:code' %}" method="post">
-		{% csrf_token %}
-		{% for field in form %}
-			<tr><th>{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
-		{% endfor %}
-		<tr><td><input style="margin-left:200px;" type=submit value="submit" /></td></tr>
-	</form>
-	</table>
-	<hr>
+			<style>
+				.code{
+					width:400px;
+					height:300px;
+				}
+				.input{
+					width:400px;
+					height:150px;
+				}
+			</style>
+			<link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
+				<h1> Execute the Code: <br></h1>
+			<table>
+				<form action="{% url 'inout:code' %}" method="post">
+					{% csrf_token %}
+					{% for field in form %}
+						<tr><th>{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
+					{% endfor %}
+					<tr><td><input style="margin-left:200px;" type=submit value="submit" /></td></tr>
+				</form>
+				</table>
+				<hr>
 {% endblock %}

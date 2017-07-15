@@ -9,14 +9,15 @@ from django.contrib.admin import widgets
 class CreateContest(forms.Form):
 	
 	name = forms.CharField(widget=forms.TextInput(attrs=dict(max_length=30)), label="Name")
-	contest_code = forms.CharField(widget=forms.TextInput(attrs=dict(max_length=30)), label="Contest Code")
+	contest_code = forms.CharField(widget=forms.TextInput(attrs=dict(max_length=30)),
+								   label="Contest Code")
 	start_date = forms.SplitDateTimeField(widget=widgets.AdminSplitDateTime())
 	end_date = forms.SplitDateTimeField(widget=widgets.AdminSplitDateTime())
 
 	def clean_contest_code(self):
 		
 		try:
-			c = Contest.objects.get(contest_code=self.cleaned_data['contest_code'])
+			contest = Contest.objects.get(contest_code=self.cleaned_data['contest_code'])
 			raise forms.ValidationError("A Contest with same contest code already exists.")
 		except:
 			return self.cleaned_data['contest_code']
@@ -25,7 +26,7 @@ class CreateContest(forms.Form):
 		
 		now = aware(datetime.datetime.now())
 
-		if(now>=self.cleaned_data['start_date']):
+		if now >= self.cleaned_data['start_date']:
 			raise forms.ValidationError("Past dates are not allowed.")
 
 		return self.cleaned_data['start_date']
@@ -34,7 +35,9 @@ class CreateContest(forms.Form):
 		
 		now = aware(datetime.datetime.now())
 		
-		if now>=self.cleaned_data['end_date'] or self.cleaned_data['end_date'] <= self.cleaned_data['start_date']:
+		condition = self.cleaned_data['end_date'] <= self.cleaned_data['start_date']
+		
+		if now >= self.cleaned_data['end_date'] or condition:
 			raise forms.ValidationError("Invalid time")
 		
 		return self.cleaned_data['end_date']
@@ -51,7 +54,7 @@ class Prob(forms.ModelForm):
 	
 	def clean_code(self):
 		try:
-			q = Problem.objects.get(code=self.cleaned_data['code'])
+			problem = Problem.objects.get(code=self.cleaned_data['code'])
 			raise forms.ValidationError("A problem with this code already exists.")
 		except:
 			return self.cleaned_data['code']
