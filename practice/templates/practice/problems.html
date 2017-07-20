@@ -1,0 +1,26 @@
+{% extends 'inout/base.html' %}
+{% load static %}
+
+{% block content %}
+
+	<div class='container'>
+		<div class='row'>
+			<center>
+				<table class='table table-bordered'>
+					<tbody>
+						{% for prob in problems %}
+							<tr>
+								<td style='font-size:20px; text-align:center;'>
+									<a href="{% url 'contests:problem' code=prob.problem.contest.contest_code question=prob.problem.code %}">
+										{{prob.problem.code}}
+									</a>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</center>
+		</div>
+	</div>
+
+{% endblock %}

@@ -2,6 +2,19 @@
 
 {% block content %}
 
-	There are no problems, yet. We'll be back soon.
+	<center>
+		<table class='table table-bordered' style='text-align:center;'>
+			<caption style='border:1px solid black; text-align:center;'><h2>Tags</h2></caption>
+			<tbody>
+				{% for tag in tags %}
+					<tr>
+						<td>
+							<a href="{% url 'practice:gettag' code=tag.code %}" style='font-size:25px; color:blue;' >{{tag.name}}</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</center>
 
 {% endblock %}
