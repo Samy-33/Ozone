@@ -164,8 +164,7 @@ def addq(request, code):
                         for line in request.FILES[file].readlines():
                             f.write(line.decode('utf-8'))
 
-                tags = request.POST.get('tags')
-                print(tags)
+                tags = form.cleaned_data['tags']
                 for tag_id in tags:
                     try:
                         tag = Tag.objects.get(id=tag_id)
