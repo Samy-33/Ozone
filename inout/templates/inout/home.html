@@ -4,6 +4,66 @@
 		<center>
 			Welcome <b>{{ user.username }}</b>, this is OzoneJ.<br>
 			Enjoy solving puzzles? This is the right place for you.
+			<br><br>
+			<div class='jumbotron' style="padding:20px;">
+				<div class="row">
+					<div class="col-sm-6">
+						<table class="table table-bordered">
+							<caption><h2 style="color:red;">Recent Comments on Contests</h2></caption>
+							<thead>
+								<tr>
+									<th>Text</th>
+									<th>Author</th>
+									<th>Contest</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for conv in convc %}
+									<tr>
+										<td>
+											<a href="{% url 'contests:convC' code=conv.contest.contest_code pk=conv.pk%}">{{conv.text}}</a>
+										</td>
+										<td>
+											<a href="{% url 'inout:profile' username=conv.user.username %}">{{conv.user.username}}</a>
+										</td>
+										<td>
+											<a href="{% url 'contests:contest' code=conv.contest.contest_code %}">{{conv.contest.contest_code}}</a>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<div class="col-sm-6">
+						<table class="table table-bordered">
+							<caption><h2 style="color:red;">Recent Comments on Problems</h2></caption>
+							<thead>
+								<tr>
+									<th>Text</th>
+									<th>Author</th>
+									<th>Problem</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for conv in convq %}
+									<tr>
+										<td>
+											<a href="{% url 'contests:convQ' question=conv.problem.code pk=conv.pk%}">{{conv.text}}</a>
+										</td>
+										<td>
+											<a href="{% url 'inout:profile' username=conv.user.username %}">{{conv.user.username}}</a>
+										</td>
+										<td>
+											<a href="{% url 'contests:problem' code=conv.problem.contest.contest_code question=conv.problem.code %}">{{conv.problem.code}}</a>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
 		</center>
 
 {% endblock %}

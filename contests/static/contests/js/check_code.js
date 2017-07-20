@@ -35,7 +35,9 @@ function req(problem, code, lang){
 			},
 			success:function(data){
 				var div = document.getElementById("result");
-				color = 'green';
+                var load = document.getElementById('load');
+                load.innerHTML = '';
+                color = 'green';
 				if(data['status']=='SE' || data['status']=='RTE'){
 					color = 'blue';
 				}
@@ -55,6 +57,7 @@ function submit(problem, src){
 	var code = document.getElementById("editcode").value;
 	var lang = document.getElementById("lang").value;
 	src = "<center><img src='"+src+"'></img></center>";
-	document.getElementById("result").innerHTML = src;
+	document.getElementById("load").innerHTML = src;
+    document.getElementById('result').innerHTML = '';
 	req(problem, code, lang);
 }

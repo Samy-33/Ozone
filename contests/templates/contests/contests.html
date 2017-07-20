@@ -4,6 +4,7 @@
 
 <span style='float:right;'><a href='create/'><button>Create Contest</button></a></span>
 <link href='{% static "contests/css/contest.css" %}' rel='stylesheet' type='text/css' />
+<script src="{% static 'contests/js/timeshow.js' %}" type='text/javascript'></script>
 <br><hr><br>
 <div class="row container-fluid">
 	<div class="col-lg-4">
@@ -11,16 +12,23 @@
 		<div class="current">
 			<h1> CURRENT </h1>
 			{% if current %}
+                <div class='ccont'>
 				{% for contest in current %}
-					<a href='q/{{ contest.contest_code }}/'>
-						<div class="cont">
-							<h2>
-								{{contest.name}}
-							</h2><br>
-						</div>
-					</a><br><br>
+                    <div class="cont">
+                        <div class='c-innercont'>
+					   
+							<span>
+                                <h2><a href='q/{{ contest.contest_code }}/'>
+								{{contest.name}}</a>
+							    </h2>
+                            </span>
+                            <span class='code'> {{contest.contest_code}} </span>
+					   </div>
+                        <hr>
+                    </div><br>
 
 				{% endfor %}
+                    </div>
 			{% else %}
 				There is no contest going on right now.
 			{% endif %}
@@ -30,16 +38,18 @@
 		<div class="upcoming">
 			<h1> UPCOMING</h1>
 			{% if upcoming %}
+                <div class='ccont'>
 				{% for contest in upcoming %}
-
-					<a href="q/{{ contest.contest_code }}/">
-						<div class="cont">
-							<h2>
-								{{contest.name}}
-							</h2><br>
-						</div>
-					</a><br><br>
+                    <div class="cont">
+                         <div class="u-innercont">
+					   
+						  <span>
+							<h2><a href="q/{{ contest.contest_code }}/">
+								{{contest.name}} </a></h2></span><span class='code'> {{contest.contest_code}} </span>
+                        </div>
+                    </div><br><br>
 				{% endfor %}
+                    </div>
 			{% else %}
 				No upcoming Contests, yet.
 			{% endif %}
@@ -50,14 +60,14 @@
 			<h1> Your Contests</h1>
 			{% if usrs_contest %}
 				{% for contest in usrs_contest %}
-
-					<a href="q/{{ contest.contest_code }}/">
 						<div class="cont">
-							<h3>
-								{{contest.name}}
-							</h3><br>
+                            <a href="q/{{ contest.contest_code }}/">
+                                <h3>
+                                    {{contest.name}}
+                                </h3>
+                            </a><br>
 						</div>
-					</a><br><br>
+					<br><br>
 				{% endfor %}
 			{% else %}
 				No Contests, yet.

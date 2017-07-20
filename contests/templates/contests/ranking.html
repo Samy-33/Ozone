@@ -2,8 +2,18 @@
 {% load static %}
 {% block content %}
 <center>
+    <script src="{% static 'contests/js/timeshow.js' %}" type='text/javascript'></script>
 	<table class="table table-bordered">
-		<caption style="color:green;"><center><h2> {{contest.name}} </h2></center></caption>
+		<caption style="color:green;">
+            <center>
+                <h2> {{contest.name}} </h2>
+                <div class='cont'>
+                    <span class='code'>
+                        {{contest.contest_code}}
+                    </span>
+                </div>
+            </center>
+        </caption>
 		<thead>
 			<tr>
 				<th>
@@ -11,6 +21,9 @@
 				</th>
 				<th>
 					User Name
+				</th>
+				<th>
+					Penalty
 				</th>
 				<th>
 					Score
@@ -35,6 +48,9 @@
 						<a style="color:{{ u.user.profile.color }}; font-weight:bold;" href="{% url 'inout:profile' username=u.user.username %}">
 							{{u.user.username}}
 						</a>
+					</td>
+					<td>
+						+{{u.penalty}}
 					</td>
 					<td>{{u.score}}</td>
 					<td>

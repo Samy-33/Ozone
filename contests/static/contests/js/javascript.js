@@ -65,7 +65,6 @@ function showForm(){
 	ele.removeChild(btn);
 	str = ele.innerHTML;
 //	alert(ele.innerHTML);
-	html = "<form action='.' method=post>"+str+"Comment: <input type='textarea' name='com' required></input><input type=submit></input></form><br><hr>";
+	html = "<form action='.' method=post>"+str+"<label for='com'>Comment:</label><br> <textarea name='com' rows=10 required ></textarea><br><input type=submit /></form><br><hr>";
 	ele.innerHTML = html;
 }
-

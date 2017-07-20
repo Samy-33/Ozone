@@ -25,7 +25,7 @@ SECRET_KEY = '$-hl1_gvm@=83o_dg)*bxz(n$m8n)=1fyafwil+kp(t+xvy&%+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'f336d1a3.ngrok.io']
+ALLOWED_HOSTS = ['localhost', 'e8aff2e1.ngrok.io']
 
 
 # Application definition
@@ -122,7 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 #STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),]
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = '/static'
 LOGIN_REDIRECT_URL = '/home/'
 LOGIN_URL = '/login'
 APPEND_SLASH=False
