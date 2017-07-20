@@ -3,4 +3,3 @@
 */migrations/*
 db.sqlite3
 tmp/
-static/
