@@ -25,15 +25,15 @@ SECRET_KEY = '$-hl1_gvm@=83o_dg)*bxz(n$m8n)=1fyafwil+kp(t+xvy&%+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'e8aff2e1.ngrok.io']
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
 
 INSTALLED_APPS = [
 	'inout.apps.InoutConfig',
-	'contests.apps.ContestsConfig',
 	'practice.apps.PracticeConfig',
+	'contests.apps.ContestsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -125,7 +125,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/static'
 LOGIN_REDIRECT_URL = '/home/'
 LOGIN_URL = '/login'
-APPEND_SLASH=False
+APPEND_SLASH = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER='saket.patel@iiitdmj.ac.in'

@@ -42,7 +42,10 @@ class CreateContest(forms.Form):
         return self.cleaned_data['end_date']
 
 class Prob(forms.ModelForm):
-    choices = tuple((tag.id, tag.name) for tag in Tag.objects.all())
+    try:
+        choices = tuple((tag.id, tag.name) for tag in Tag.objects.all())
+    except:
+        choices = []
     text = forms.CharField(widget=forms.Textarea)
     tags = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=choices)
     class Meta:

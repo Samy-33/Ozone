@@ -279,6 +279,7 @@ def code_edit(request):
 
         if 'python' in lang:
             run_cmd = 'timeout 5s {}'.format(cmd[lang][1]%(code_path, input_file))
+            print(cmd[lang])
             try:
                 ps = check_output(run_cmd, shell=True, stderr=STDOUT).decode('utf-8')
                 return HttpResponse(ps)

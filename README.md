@@ -8,9 +8,8 @@ And additional requirements are in *requirements.txt*
 
 ## How to run it?  
 
-  * Create a folder tmp/problems/ in root directory of the project.  
-  * `$ python manage.py makemigrations`  
-  * `$ python manage.py migrate`  
+  * Create a folder tmp/problems/ in root directory of the project.   
+  * `$ python manage.py migrate --run-syncdb`  
   * `$ python manage.py createsuperuser`  
   * Login using the credentials of superuser  
 
