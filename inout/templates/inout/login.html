@@ -1,31 +1,47 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html>
-	<head>
-		<title> Welcome to Ozone Judge </title>
-		<link href="{% static 'inout/css/base.css' %}" rel="stylesheet" type="text/css" />
-		<link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
-	</head>
-	<body>
-		<center>
-			<p style="color:blue; font-size:30px;">
-				<a href='{% url "inout:home"%}' >Ozone</a>
-				<sup style="font-size:10px;">iiitdmj</sup>
-			</p>
-			<hr><br>
-			<h1> Login </h1>
-			<form method=post>
-				{% csrf_token %}
-				<table>
-					{% for field in form %}
-						<tr>
-							<th style="float:left;">{{field.label_tag}}</th>
-							<td>{{field}}{{field.errors}}</td>
-						</tr>
-					{% endfor %}
-				</table>
-				<button type="submit" > Login </button> Or <a href="{% url 'inout:register' %}">Register</a>
-			</form>
-		</center>
-	</body>
+  <head>
+    <title> Welcome to Ozone Judge </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'inout/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'inout/css/base.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'inout/css/login.css' %}" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">
+          <center>
+            <p class="heading">
+              <a href='{% url "inout:home"%}'>Ozone</a>
+              <sup>IIITDMJ</sup>
+            </p>
+          </center>
+          <hr>
+          <center>
+            <div class="login-heading">Login into Ozone</div>
+          </center>
+          <br>
+          <form method="post" role="form">
+            {% csrf_token %}
+            <center>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Username" autofocus required="true">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" placeholder="Password" required="true">
+              </div>
+
+              <button type="submit" class="login-button btn btn-primary"> Login </button>
+              Or
+              <a href="{% url 'inout:register' %}" class="login-button btn btn-primary">Register</a>
+            </center>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
