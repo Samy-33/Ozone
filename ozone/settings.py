@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Kolkata'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -132,3 +132,15 @@ EMAIL_HOST_USER='saket.patel@iiitdmj.ac.in'
 EMAIL_HOST_PASSWORD='xxxxxxxx'
 #EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
+
+if DEBUG:
+    MIDDLEWARE_CLASSES += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
+    INTERNAL_IPS = ('127.0.0.1', )
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+    }
