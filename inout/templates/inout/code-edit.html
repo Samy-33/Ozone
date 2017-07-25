@@ -1,27 +1,28 @@
 {% extends 'inout/base.html' %}
 {% load static %}
-{% block content %}
 
-			<style>
-				.code{
-					width:400px;
-					height:300px;
-				}
-				.input{
-					width:400px;
-					height:150px;
-				}
-			</style>
-			<link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
-				<h1> Execute the Code: <br></h1>
-			<table>
-				<form action="{% url 'inout:code' %}" method="post">
-					{% csrf_token %}
-					{% for field in form %}
-						<tr><th>{{field.label_tag}}</th><td>{{field}}{{field.errors}}</td></tr>
-					{% endfor %}
-					<tr><td><input style="margin-left:200px;" type=submit value="submit" /></td></tr>
-				</form>
-				</table>
-				<hr>
+{% block css %}
+  <link href="{% static 'inout/css/form-table.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'inout/css/code-edit.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %}
+  <div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
+    <div class="code-edit-heading">Execute the Code</div>
+
+    <div class="code-edit-form">
+      <form action="{% url 'inout:code' %}" method="post" role="form">
+        {% csrf_token %}
+
+        {% for field in form %}
+          {{field.label_tag}}
+          <div class="form-group">
+            {{field}}
+          </div>
+        {% endfor %}
+
+        <input type="submit" value="Run" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
 {% endblock %}

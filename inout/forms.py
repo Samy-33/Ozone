@@ -7,6 +7,7 @@ from .models import *
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+
 class RegistrationForm(forms.Form):
     username = forms.RegexField(
         regex=r'^\w+$',
@@ -55,18 +56,30 @@ class RegistrationForm(forms.Form):
                 raise forms.ValidationError(_("Passwords do not match."))
         return self.cleaned_data
 
+
 class ActivateForm(forms.Form):
     act_code = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=6)), label=_("Activation Code"))
 
-languages = (
-    ('cpp', 'c++'),
-    ('c', 'c'),
-    ('python2', 'python2.7'),
-    ('python3', 'python3.7'),
-    ('java', 'java'),
-)
 	
 class CodeForm(forms.Form):
-    language=forms.ChoiceField(choices=languages, required=True)
-    code = forms.CharField(widget=forms.Textarea(attrs={'max_length':5000, 'class':"code"}), label=_("Code"))
-    inpt = forms.CharField(widget=forms.Textarea(attrs={'max_length':100, 'class':"input"}), label=_("Input"))
+    LANGUAGES = (
+        ('cpp', 'C++'),
+        ('c', 'C'),
+        ('python2', 'Python 2.7'),
+        ('python3', 'Python 3.7'),
+        ('java', 'Java'),
+    )
+
+    language = forms.ChoiceField(
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        choices=LANGUAGES
+    )
+    code = forms.CharField(
+        widget=forms.Textarea(attrs={'max_length': 5000, 'class': "code form-control"}),
+        label=_("Code")
+    )
+    inpt = forms.CharField(
+        widget=forms.Textarea(attrs={'max_length': 100, 'rows': 3, 'class': "input form-control"}),
+        label=_("Input"),
+        required=False
+    )
