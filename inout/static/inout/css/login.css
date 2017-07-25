@@ -35,3 +35,7 @@ sup {
     width: 25%;
     margin: 0 10px auto;
 }
+.login-errors ul li {
+    color: #f00;
+    font-weight: 100;
+}
