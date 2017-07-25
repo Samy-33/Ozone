@@ -10,7 +10,7 @@ sup {
     top: -2em;
 }
 .table .no-border tr td, .table .no-border tr th {
-  border-width: 0;
+    border-width: 0;
 }
 .btn{
 	width: 10em;
@@ -25,4 +25,12 @@ sup {
 }
 .heading a:link{
     text-decoration: none;
+}
+.back-link {
+    float: left;
+    margin-left: 3%;
+}
+.logout-link {
+    float: right;
+    margin-right: 3%;
 }
