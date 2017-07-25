@@ -1,7 +1,28 @@
-.table.no-border tr td, .table.no-border tr th {
+body {
+    background-color: #eef;
+    margin-top: 1%;
+}
+hr {
+    border-top: 1px solid #999;
+}
+sup {
+    font-size: 7px;
+    top: -2em;
+}
+.table .no-border tr td, .table .no-border tr th {
   border-width: 0;
 }
-
 .btn{
-	width:10em;
+	width: 10em;
+}
+.heading {
+    color: blue;
+    font-size: 30px;
+    padding: 0;
+    margin: 10px 0 0 0;
+    width: 40.0%;
+    display: inline-block;
+}
+.heading a:link{
+    text-decoration: none;
 }
