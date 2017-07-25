@@ -9,6 +9,7 @@
 {% block content %}
   <div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
     <div class="code-edit-heading">Execute the Code</div>
+    <br>
 
     <div class="code-edit-form">
       <form action="{% url 'inout:code' %}" method="post" role="form">
@@ -21,7 +22,7 @@
           </div>
         {% endfor %}
 
-        <input type="submit" value="Run" class="btn btn-primary">
+        <input type="submit" value="Run" class="run-btn btn btn-primary">
       </form>
     </div>
   </div>

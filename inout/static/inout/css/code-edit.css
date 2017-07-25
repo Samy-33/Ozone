@@ -1,18 +1,18 @@
 .code-edit-heading {
     font-size: 200%;
     font-family: Georgia;
-    text-align: center; 
+    text-align: center;
 }
 .code-edit-form {
     margin-left: 10%;
 }
-.code-edit-form .code {
-    width: 400px;
-    height: 300px;
-}
-.code-edit-form .input {
-    width: 400px;
+.code-edit-form .codebox {
+    width: 90%;
 }
 .code-edit-form .form-group select {
-    width: 12%;
+    width: 30%;
+}
+.code-edit-form .run-btn {
+    float: right;
+    margin: 0 10% 10% 0;
 }

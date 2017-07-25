@@ -75,11 +75,11 @@ class CodeForm(forms.Form):
         choices=LANGUAGES
     )
     code = forms.CharField(
-        widget=forms.Textarea(attrs={'max_length': 5000, 'class': "code form-control"}),
+        widget=forms.Textarea(attrs={'max_length': 5000, 'class': "codebox form-control"}),
         label=_("Code")
     )
     inpt = forms.CharField(
-        widget=forms.Textarea(attrs={'max_length': 100, 'rows': 3, 'class': "input form-control"}),
+        widget=forms.Textarea(attrs={'max_length': 100, 'rows': 3, 'class': "codebox form-control"}),
         label=_("Input"),
         required=False
     )
