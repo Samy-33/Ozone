@@ -1,27 +1,5 @@
-body {
-    background-color: #eef;
-    margin-top: 3%;
-}
-hr {
-    border-top: 1px solid #999;
-}
-sup {
-    font-size: 7px;
-    top: -2em;
-}
 .form-group {
-    width: 80%;
-}
-.heading {
-    color: blue;
-    font-size: 30px;
-    padding: 0;
-    margin: 10px 0 0 0;
-    width: 40.0%;
-    display: inline-block;
-}
-.heading a:link{
-    text-decoration: none;
+    width: 80% !important;
 }
 .login-heading {
     font-size: 20px;
@@ -29,13 +7,12 @@ sup {
     margin: 0px auto;
     padding: 0;
     display: block;
-    width: 45%;
+    width: 60%;
 }
 .login-button {
     width: 25%;
     margin: 0 10px auto;
 }
-.login-errors ul li {
-    color: #f00;
-    font-weight: 100;
+.register-form-inputs {
+    margin-left: 16.5%;
 }

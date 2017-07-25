@@ -8,17 +8,37 @@ class DateInput(forms.DateInput):
     input_type = 'date'
 
 class RegistrationForm(forms.Form):
-    username = forms.RegexField(regex=r'^\w+$', 
-                                widget=forms.TextInput(attrs=dict(required=True, max_lenght=20)),
-                                label=_('Username'),
-                                error_messages={'invalid':_("This is not a valid username [Only letters and digits allowed]")})
-    fname = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=20)), label=_("First Name"))
-    lname = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=20)), label=_("Last Name"))
-    dob = forms.DateTimeField(widget=forms.DateInput(attrs=dict(required=False, placeholder="YYYY-MM-DD")), label=_("Date of Birth"))
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=True)),
-                                label=_("Password"))
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=True)),
-                                label=_("Repeat Password"))
+    username = forms.RegexField(
+        regex=r'^\w+$',
+        widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
+                                      'placeholder': 'Username'}),
+        label=_('Username'),
+        error_messages={'invalid': ("This is not a valid username [Only letters and digits allowed]")}
+    )
+    fname = forms.CharField(
+        widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
+                                      'placeholder': 'First Name'}),
+        label=_("First Name")
+    )
+    lname = forms.CharField(
+        widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
+                                      'placeholder': 'Last Name'}),
+        label=_("Last Name")
+    )
+    dob = forms.DateTimeField(
+        widget=forms.DateInput(attrs={'type': 'date', 'required': False, 'class': 'form-control'}),
+        label=_("Date of Birth")
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'required': True, 'max_length': 30, 'render_value': True,
+                                          'class': 'form-control', 'placeholder': 'Password'}),
+        label=_("Password")
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'required': True, 'max_length': 30, 'render_value': True,
+                                          'class': 'form-control', 'placeholder': 'Repeat Password'}),
+        label=_("Repeat Password")
+    )
 
 
     def clean_username(self):

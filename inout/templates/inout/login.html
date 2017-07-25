@@ -15,11 +15,10 @@
     <form method="post" role="form">
       {% csrf_token %}
       {% if form.errors %}
-        <div class="login-errors">
+        <div class="alert alert-danger" role="alert">
+          <span class="sr-only">Error:</span>
           <ul>
-            <li>
-              Please enter a valid username/password.
-            </li>
+            <li>Enter a valid username/password.</li>
           </ul>
         </div>
       {% endif %}
