@@ -26,8 +26,9 @@ class RegistrationForm(forms.Form):
         label=_("Last Name")
     )
     dob = forms.DateTimeField(
-        widget=forms.DateInput(attrs={'type': 'date', 'required': False, 'class': 'form-control'}),
-        label=_("Date of Birth")
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label=_("Date of Birth"),
+        required=False
     )
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={'required': True, 'max_length': 30, 'render_value': True,

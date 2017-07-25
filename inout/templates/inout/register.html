@@ -15,12 +15,14 @@
     <form method='post' action='{% url "inout:register"%}' role="form">
       {% csrf_token %}
 
-      <div class="alert alert-danger" role="alert">
-        <span class="sr-only">Error:</span>
-        {% for key, error in form.errors.items %}
-          {{ error }}
-        {% endfor %}
-      </div>
+      {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="sr-only">Error:</span>
+          {% for key, error in form.errors.items %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <div class="register-form-inputs">
         {% for field in form %}
