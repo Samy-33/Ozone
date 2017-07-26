@@ -17,12 +17,12 @@ class RegistrationForm(forms.Form):
         error_messages={'invalid': ("This is not a valid username [Only letters and digits allowed]")}
     )
     fname = forms.CharField(
-        widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
+        widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
                                       'placeholder': 'First Name'}),
         label=_("First Name")
     )
     lname = forms.CharField(
-        widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
+        widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
                                       'placeholder': 'Last Name'}),
         label=_("Last Name")
     )
@@ -32,13 +32,15 @@ class RegistrationForm(forms.Form):
         required=False
     )
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'required': True, 'max_length': 30, 'render_value': True,
-                                          'class': 'form-control', 'placeholder': 'Password'}),
+        widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
+                                          'render_value': True, 'class': 'form-control',
+                                          'placeholder': 'Password (8-30 characters)'}),
         label=_("Password")
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'required': True, 'max_length': 30, 'render_value': True,
-                                          'class': 'form-control', 'placeholder': 'Repeat Password'}),
+        widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
+                                          'render_value': True, 'class': 'form-control',
+                                            'placeholder': 'Repeat Password'}),
         label=_("Repeat Password")
     )
 
@@ -58,7 +60,10 @@ class RegistrationForm(forms.Form):
 
 
 class ActivateForm(forms.Form):
-    act_code = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=6)), label=_("Activation Code"))
+    act_code = forms.CharField(
+        widget=forms.TextInput(attrs={ 'maxlength': 6, 'class': "activate-input form-control" }),
+        label=_("Activation Code")
+    )
 
 	
 class CodeForm(forms.Form):
