@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.conf import settings
 
 urlpatterns = [
-	url(r'', include('inout.urls')),
+	url(r'', include('inout.urls', namespace="inout")),
 	url(r'^contests/', include('contests.urls', namespace='contests')),
 	url(r'^practice/', include('practice.urls', namespace='practice')),
 	url(r'^admin/', admin.site.urls),

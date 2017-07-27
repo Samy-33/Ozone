@@ -1,45 +1,26 @@
-{% extends 'inout/base.html' %}
+<div class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">
+  <center>
+    <form method='post' action="{% url 'inout:activate' %}" role="form">
+      {% csrf_token %}
 
-{% block css %}
-  <style>
-    .activate-input {
-      width: 30%;
-    }
-    .activate-btn {
-      width: 22%;
-      text-align: center;
-    }
-    .alert ul {
-      padding-left: 5%;
-    }
-  </style>
-{% endblock %}
+      {% if error %}
+        <div class="alert alert-danger" role="alert">
+          <span class="sr-only">Error:</span>
+          <ul>
+            <li>{{ error }}</li>
+          </ul>
+        </div>
+      {% endif %}
 
-{% block content %}
-  <div class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">
-    <center>
-      <form method='post' action="{% url 'inout:activate' %}" role="form">
-        {% csrf_token %}
+      {% for field in form %}
+        {{ field.label_tag }}
+        <div class="form-group">
+          {{ field }}
+        </div>
+      {% endfor %}
 
-        {% if error %}
-          <div class="alert alert-danger" role="alert">
-            <span class="sr-only">Error:</span>
-            <ul>
-              <li>{{ error }}</li>
-            </ul>
-          </div>
-        {% endif %}
-
-        {% for field in form %}
-          {{ field.label_tag }}
-          <div class="form-group">
-            {{ field }}
-          </div>
-        {% endfor %}
-
-        <input type="hidden" name="usr" value="{{ usr }}">
-        <input type="submit" value="Activate" class="activate-btn btn btn-primary">
-      </form>
-    </center>
-  </div>
-{% endblock %}
+      <input type="hidden" name="usr" value="{{ usr }}">
+      <input type="submit" value="Activate" class="activate-btn btn btn-primary">
+    </form>
+  </center>
+</div>

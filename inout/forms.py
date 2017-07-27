@@ -12,35 +12,35 @@ class RegistrationForm(forms.Form):
     username = forms.RegexField(
         regex=r'^\w+$',
         widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
-                                      'placeholder': 'Username'}),
+                                      'id': 'rusername','placeholder': 'Username'}),
         label=_('Username'),
         error_messages={'invalid': ("This is not a valid username [Only letters and digits allowed]")}
     )
     fname = forms.CharField(
         widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
-                                      'placeholder': 'First Name'}),
+                                      'id': 'rfname','placeholder': 'First Name'}),
         label=_("First Name")
     )
     lname = forms.CharField(
         widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
-                                      'placeholder': 'Last Name'}),
+                                      'id': 'rlname', 'placeholder': 'Last Name'}),
         label=_("Last Name")
     )
     dob = forms.DateTimeField(
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'id': 'rdob'}),
         label=_("Date of Birth"),
         required=False
     )
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
                                           'render_value': True, 'class': 'form-control',
-                                          'placeholder': 'Password (8-30 characters)'}),
+                                          'id': 'rpassword1', 'placeholder': 'Password (8-30 characters)'}),
         label=_("Password")
     )
     password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
                                           'render_value': True, 'class': 'form-control',
-                                            'placeholder': 'Repeat Password'}),
+                                          'id': 'rpassword2', 'placeholder': 'Repeat Password'}),
         label=_("Repeat Password")
     )
 

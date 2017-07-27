@@ -1,74 +1,92 @@
+import os
+import json
+import random
+import socks
+import time
+from subprocess import *
+
+from django import forms
 from django.contrib.auth.models import User
-from .forms import RegistrationForm, ActivateForm, CodeForm
 from django.http import HttpResponse, JsonResponse		
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from inout.models import Profile
-from contests.models import Contest, Problem, Solve
 from django.core.mail import send_mail
 from django.core import serializers
-from django import forms
-from subprocess import *
+
+from contests.models import Contest, Problem, Solve, CommentC, CommentQ, Ranking
 from .global_vars import *
-from contests.models import CommentC, CommentQ, Ranking
-import os, json
-import random, socks, time
+from .models import Profile
+from .decorators import is_activated
+from .forms import RegistrationForm, ActivateForm, CodeForm
 
-
-def is_activated(f):
-    """
-    A decorator to allow only logged in and activated accounts to enter
-    """
-    @login_required(login_url='/')
-    def wrapper(*args, **kwargs):
-
-        if(args[0].user.profile.activated):
-            return f(*args, **kwargs)
-        return redirect('inout:activate')
-
-    return wrapper
 
 def clogin(request):
     """
-    View for login page
+    View for authentication page
     """
+
     if request.user.is_authenticated():
         if(request.user.is_active):
             return redirect('inout:home')
         else:
             return redirect('inout:activate')
     else:
-        return auth_views.LoginView.as_view(template_name='inout/login.html')(request)
+        register_form = RegistrationForm()
+        return render(request, 'inout/auth.html', {'register_form': register_form})
+
+
+def authenticate_user(request):
+    """
+    View for authenticating a user
+    """
+
+    resp = { 'success': False, 'message': ['GET method not allowerd'] }
+
+    if request.is_ajax():
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            resp = { 'success': True }
+        else:
+            resp = { 'success': False, 'message': ['Enter a valid username/password.'] }
+
+    return HttpResponse(json.dumps(resp), content_type='application/json')
+
 
 def register(request):
     """
     View for registration page
     """
+
+    resp = { 'success': False, 'message': ['GET method not allowerd'] }
     form = RegistrationForm()
 
-    if request.user.is_authenticated():
-        return redirect('inout:home')
-
-    elif request.method == 'POST':
+    if request.is_ajax():
         form = RegistrationForm(request.POST)
 
         if form.is_valid():
+            user = User.objects.create_user(
+                username = form.cleaned_data['username'],
+                password = form.cleaned_data['password1'],
+                first_name = form.cleaned_data['fname'],
+                last_name = form.cleaned_data['lname'],
+            )
 
-            u = User.objects.create_user(username = form.cleaned_data['username'],
-                                         password = form.cleaned_data['password1'],
-                                         first_name = form.cleaned_data['fname'],
-                                         last_name = form.cleaned_data['lname'],)
-            code = ''
-            for i in range(6):
-                code += chr(random.randrange(48, 122))
+            code = ''.join([chr(random.randrange(48, 122)) for i in range(6)])
 
-            u.profile.birth = form.cleaned_data['dob']
-            u.profile.activation_code = code
+            user.profile.birth = form.cleaned_data['dob']
+            user.profile.activation_code = code
+
             print(code)
-            u.profile.rating = 1200
-            u.profile.save()
+            
+            user.profile.rating = 1200
+            user.profile.save()
 
             """
             send_mail('Activation Code',
@@ -77,13 +95,15 @@ def register(request):
                       [list of all the recipients])
             Email the user
             """
-            usr = form.cleaned_data['username']
-            form = ActivateForm(initial={})
-            return redirect('inout:not_activated')
+
+            resp = { 'success': True }
         else:
-            return render(request, 'inout/register.html', {'form':form})
-    else:
-        return render(request, 'inout/register.html', {'form':form})
+            error_json = json.loads(form.errors.as_json())
+            message = [error_json[error][0]['message'] for error in error_json]
+            resp = { 'success': False, 'message': message }
+
+    return HttpResponse(json.dumps(resp), content_type='application/json')
+
 
 def activate(request):
     """
