@@ -7,18 +7,42 @@ from .models import *
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+
 class RegistrationForm(forms.Form):
-    username = forms.RegexField(regex=r'^\w+$', 
-                                widget=forms.TextInput(attrs=dict(required=True, max_lenght=20)),
-                                label=_('Username'),
-                                error_messages={'invalid':_("This is not a valid username [Only letters and digits allowed]")})
-    fname = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=20)), label=_("First Name"))
-    lname = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=20)), label=_("Last Name"))
-    dob = forms.DateTimeField(widget=forms.DateInput(attrs=dict(required=False, placeholder="YYYY-MM-DD")), label=_("Date of Birth"))
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=True)),
-                                label=_("Password"))
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=True)),
-                                label=_("Repeat Password"))
+    username = forms.RegexField(
+        regex=r'^\w+$',
+        widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
+                                      'id': 'rusername','placeholder': 'Username'}),
+        label=_('Username'),
+        error_messages={'invalid': ("This is not a valid username [Only letters and digits allowed]")}
+    )
+    fname = forms.CharField(
+        widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
+                                      'id': 'rfname','placeholder': 'First Name'}),
+        label=_("First Name")
+    )
+    lname = forms.CharField(
+        widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
+                                      'id': 'rlname', 'placeholder': 'Last Name'}),
+        label=_("Last Name")
+    )
+    dob = forms.DateTimeField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'id': 'rdob'}),
+        label=_("Date of Birth"),
+        required=False
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
+                                          'render_value': True, 'class': 'form-control',
+                                          'id': 'rpassword1', 'placeholder': 'Password (8-30 characters)'}),
+        label=_("Password")
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
+                                          'render_value': True, 'class': 'form-control',
+                                          'id': 'rpassword2', 'placeholder': 'Repeat Password'}),
+        label=_("Repeat Password")
+    )
 
 
     def clean_username(self):
@@ -34,18 +58,33 @@ class RegistrationForm(forms.Form):
                 raise forms.ValidationError(_("Passwords do not match."))
         return self.cleaned_data
 
-class ActivateForm(forms.Form):
-    act_code = forms.CharField(widget=forms.TextInput(attrs=dict(required=True, max_length=6)), label=_("Activation Code"))
 
-languages = (
-    ('cpp', 'c++'),
-    ('c', 'c'),
-    ('python2', 'python2.7'),
-    ('python3', 'python3.7'),
-    ('java', 'java'),
-)
+class ActivateForm(forms.Form):
+    act_code = forms.CharField(
+        widget=forms.TextInput(attrs={ 'maxlength': 6, 'class': "activate-input form-control" }),
+        label=_("Activation Code")
+    )
+
 	
 class CodeForm(forms.Form):
-    language=forms.ChoiceField(choices=languages, required=True)
-    code = forms.CharField(widget=forms.Textarea(attrs={'max_length':5000, 'class':"code"}), label=_("Code"))
-    inpt = forms.CharField(widget=forms.Textarea(attrs={'max_length':100, 'class':"input"}), label=_("Input"))
+    LANGUAGES = (
+        ('cpp', 'C++'),
+        ('c', 'C'),
+        ('python2', 'Python 2.7'),
+        ('python3', 'Python 3.7'),
+        ('java', 'Java'),
+    )
+
+    language = forms.ChoiceField(
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        choices=LANGUAGES
+    )
+    code = forms.CharField(
+        widget=forms.Textarea(attrs={'max_length': 5000, 'class': "codebox form-control"}),
+        label=_("Code")
+    )
+    inpt = forms.CharField(
+        widget=forms.Textarea(attrs={'max_length': 100, 'rows': 3, 'class': "codebox form-control"}),
+        label=_("Input"),
+        required=False
+    )
