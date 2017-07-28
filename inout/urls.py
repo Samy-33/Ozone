@@ -15,7 +15,6 @@ urlpatterns = [
     url(r'code/$', code_edit, name='code'),
     url(r'profile/[a-zA-Z0-9]+/allowcons/$', give_contests, name='consal'),
     url(r'profile/[a-zA-Z0-9]+/allow/$', allow, name='allow'),
-    url(r'not_activated/$', not_activated, name='not_activated'),
 ]
 
 #urlpatterns += 	patterns()

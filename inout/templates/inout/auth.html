@@ -7,7 +7,7 @@
 
 {% block content %}
   <div class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">
-    <div id="login">
+    <div id="login" class="{% if hide_login %} hide {% endif %}">
       <center>
         <div class="login-heading">Login into Ozone</div>
       </center>
@@ -32,8 +32,8 @@
       </form>
     </div>
 
-    <div id="register" class="hide">{% include 'inout/register.html' %}</div>
-    <div id="activate" class="hide"></div>
+    <div id="register" class="{% if hide_register %} hide {% endif %}">{% include 'inout/register.html' %}</div>
+    <div id="activate" class="{% if hide_activate %} hide {% endif %}">{% include 'inout/activate.html' %}</div>
   </div>
 {% endblock %}
 

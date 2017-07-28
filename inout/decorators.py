@@ -3,6 +3,8 @@ Custom Decorators
 """
 
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.urls import reverse
 
 
 def is_activated(f):
@@ -15,6 +17,6 @@ def is_activated(f):
 
         if(args[0].user.profile.activated):
             return f(*args, **kwargs)
-        return redirect('inout:activate')
+        return redirect(reverse('inout:login') + '?showSection=activate')
 
     return wrapper

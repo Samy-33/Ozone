@@ -7,6 +7,8 @@ $(document).ready(function() {
 $(document).on('click', '#registerBtn', function(e) {
     e.preventDefault();
 
+    window.history.pushState({}, null, '?showSection=register');
+
     $('#login').addClass('hide');
     $('#activate').addClass('hide');
     $('#register').removeClass('hide');
@@ -15,16 +17,10 @@ $(document).on('click', '#registerBtn', function(e) {
 $(document).on('click', '#loginBtn', function(e) {
     e.preventDefault();
 
+    window.history.pushState({}, null, '?showSection=login');
+
     $('#login').removeClass('hide');
     $('#activate').addClass('hide');
-    $('#register').addClass('hide');
-});
-
-$(document).on('click', '#activateBtn', function(e) {
-    e.preventDefault();
-
-    $('#login').addClass('hide');
-    $('#activate').removeClass('hide');
     $('#register').addClass('hide');
 });
 
@@ -66,7 +62,14 @@ $(document).on('click', '#submitLogin', function(e) {
                 $('#login-errors').removeClass('hide');
             }
             else {
-                window.location.href = '/home/';
+                if (data.is_activated) {
+                    window.location.href = '/home/';
+                }
+                else {
+                    $('#activate').removeClass('hide');
+                    $('#login').addClass('hide');
+                    window.history.pushState({}, null, '?showSection=activate');
+                }
             }
         }
     });
@@ -105,7 +108,9 @@ $(document).on('click', '#submitRegister', function(e) {
                 $('#rpassword2').val('');
             }
             else {
-                $('#activateBtn').click();
+                $('#activate').removeClass('hide');
+                $('#register').addClass('hide');
+                window.history.pushState({}, null, '?showSection=activate');
             }
         }
     });
