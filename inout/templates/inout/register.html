@@ -3,22 +3,20 @@
 </center>
 <br>
 
-<div class="alert alert-danger hide" id="register-errors" role="alert"></div>
+<div class="alert alert-danger hide" id="registerErrors" role="alert"></div>
 
-<form action="#">
-  {% csrf_token %}
-  <div class="register-form-inputs">
-    {% for field in register_form %}
-      <div class="form-group">
-        {{field.label_tag}}
-        {{field}}
-      </div>
-    {% endfor %}
-  </div>
+{% csrf_token %}
+<div class="register-form-inputs">
+  {% for field in register_form %}
+    <div class="form-group">
+      {{field.label_tag}}
+      {{field}}
+    </div>
+  {% endfor %}
+</div>
 
-  <center>
-    <button id="submitRegister" class="login-button btn btn-primary">Register</button>
-    Or
-    <button id="loginBtn" class="login-button btn btn-primary">Login</a>
-  </center>
-</form>
+<center>
+  <button id="submitRegister" class="login-button btn btn-primary">Register</button>
+  Or
+  <button id="loginBtn" class="login-button btn btn-primary">Login</a>
+</center>

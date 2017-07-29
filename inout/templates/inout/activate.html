@@ -1,13 +1,4 @@
 <center>
-  {% if error %}
-    <div class="alert alert-danger" role="alert">
-      <span class="sr-only">Error:</span>
-      <ul>
-        <li>{{ error }}</li>
-      </ul>
-    </div>
-  {% endif %}
-
   <form method='post' action="{% url 'inout:activate' %}" role="form">
     {% csrf_token %}
 

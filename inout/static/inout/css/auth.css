@@ -13,7 +13,7 @@
 }
 .login-button {
     width: 25%;
-    margin: 0 10px auto;
+    margin: 5px 10px auto;
 }
 
 /* register css */
@@ -31,4 +31,7 @@
 }
 .alert ul {
     padding-left: 5%;
+}
+.red-border {
+  border-bottom: 2px solid #Ff8088;
 }

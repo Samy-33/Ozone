@@ -9,7 +9,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse		
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import views as auth_views
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
@@ -138,8 +138,13 @@ def register(request):
             resp = { 'success': True }
         else:
             error_json = json.loads(form.errors.as_json())
-            message = [error_json[error][0]['message'] for error in error_json]
-            resp = { 'success': False, 'message': message }
+            codes = [error_json[error][0]['code'] for error in error_json]
+            messages = [error_json[error][0]['message'] for error in error_json]
+
+            if 'required' in codes:
+                messages = ['Required fields are absent.']
+
+            resp = { 'success': False, 'message': messages }
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
@@ -166,10 +171,8 @@ def activate(request):
 
                         return redirect('/')
 
-                return render(
-                    request, 'inout/activate.html',
-                    {'activate_form': form, 'error': INVALID_ACTIVATION_CODE }
-                )
+                messages.add_message(request, messages.ERROR, INVALID_ACTIVATION_CODE)
+                return redirect('/?showSection=activate')
         else:
             return redirect('/')
 
