@@ -1,6 +1,16 @@
 .form-group {
     width: 80% !important;
 }
+.hideMe {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1s;
+}
+.alert.alert-danger.hideMe {
+    padding: 0;
+    border: 0;
+    max-height: 1000px;
+}
 
 /* login css */
 .login-heading {

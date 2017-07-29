@@ -7,7 +7,7 @@
 
 {% block content %}
   <div class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">
-    <div class="alert alert-danger {% if hide_activate or not messages %} hide {% endif %}" id="formErrors" role="alert">
+    <div class="alert alert-danger {% if hide_activate or not messages %} hideMe {% endif %}" id="formErrors" role="alert">
       <ul>
         {% for error in messages %}
           <li>{{ error }}</li>
@@ -15,9 +15,9 @@
       </ul>
     </div>
 
-    <div id="login" class="{% if hide_login %} hide {% endif %}">{% include 'inout/login.html' %}</div>
-    <div id="register" class="{% if hide_register %} hide {% endif %}">{% include 'inout/register.html' %}</div>
-    <div id="activate" class="{% if hide_activate %} hide {% endif %}">{% include 'inout/activate.html' %}</div>
+    <div id="login" class="{% if hide_login %} hideMe {% endif %}">{% include 'inout/login.html' %}</div>
+    <div id="register" class="{% if hide_register %} hideMe {% endif %}">{% include 'inout/register.html' %}</div>
+    <div id="activate" class="{% if hide_activate %} hideMe {% endif %}">{% include 'inout/activate.html' %}</div>
   </div>
 {% endblock %}
 

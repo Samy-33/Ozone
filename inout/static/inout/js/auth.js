@@ -9,10 +9,14 @@ $(document).on('click', '#registerBtn', function(e) {
 
     window.history.pushState({}, null, '?showSection=register');
 
-    $('#login').addClass('hide');
-    $('#activate').addClass('hide');
-    $('#register').removeClass('hide');
-    $('#formErrors').addClass('hide');
+    if (!$('#login').hasClass('hideMe')) {
+        $('#login').addClass('hideMe');
+    }
+
+    $('#login')[0].style.maxHeight = '0';
+    $('#activate')[0].style.maxHeight = '0';
+    $('#register')[0].style.maxHeight = window.outerHeight + 'px';
+    $('#formErrors').addClass('hideMe');
     removeRedBorder();
 });
 
@@ -21,10 +25,14 @@ $(document).on('click', '#loginBtn', function(e) {
 
     window.history.pushState({}, null, '?showSection=login');
 
-    $('#login').removeClass('hide');
-    $('#activate').addClass('hide');
-    $('#register').addClass('hide');
-    $('#formErrors').addClass('hide');
+    if (!$('#register').hasClass('hideMe')) {
+        $('#register').addClass('hideMe');
+    }
+
+    $('#login')[0].style.maxHeight = window.outerHeight + 'px';
+    $('#activate')[0].style.maxHeight = '0';
+    $('#register')[0].style.maxHeight = '0';
+    $('#formErrors').addClass('hideMe');
     removeRedBorder();
 });
 
@@ -50,7 +58,7 @@ validateRequiredFields = function() {
     var is_valid = true;
     for (var i=0; i < arguments.length; i++) {
         if (!arguments[i].val()) {
-            $('#formErrors').removeClass('hide');
+            $('#formErrors').removeClass('hideMe');
             arguments[i].addClass('red-border');
             is_valid = false;
         }
@@ -60,7 +68,7 @@ validateRequiredFields = function() {
     }
 
     if (is_valid) {
-        $('#formErrors').addClass('hide');
+        $('#formErrors').addClass('hideMe');
     }
 
     return is_valid;
@@ -91,16 +99,16 @@ $(document).on('click', '#submitLogin', function(e) {
                     $errors = getErrorHtml($message);
 
                 $('#formErrors').children('ul').html($errors);
-                $('#formErrors').removeClass('hide');
+                $('#formErrors').removeClass('hideMe');
             }
             else {
-                $('#formErrors').addClass('hide');
+                $('#formErrors').addClass('hideMe');
 
                 if (data.is_activated) {
                     window.location.href = '/home/';
                 }
                 else {
-                    $('#activate').removeClass('hide');
+                    $('#activate')[0].style.maxHeight = window.outerHeight + 'px';
                     $('#login').addClass('hide');
                     window.history.pushState({}, null, '?showSection=activate');
                 }
@@ -142,13 +150,13 @@ $(document).on('click', '#submitRegister', function(e) {
                     $errors = getErrorHtml($message);
 
                 $('#formErrors').children('ul').html($errors);
-                $('#formErrors').removeClass('hide');
+                $('#formErrors').removeClass('hideMe');
                 $('#rpassword1').val('');
                 $('#rpassword2').val('');
             }
             else {
-                $('#formErrors').addClass('hide');
-                $('#activate').removeClass('hide');
+                $('#formErrors').addClass('hideMe');
+                $('#activate')[0].style.maxHeight = window.outerHeight + 'px';
                 $('#register').addClass('hide');
                 window.history.pushState({}, null, '?showSection=activate');
             }
