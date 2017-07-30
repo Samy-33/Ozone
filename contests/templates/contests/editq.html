@@ -11,11 +11,11 @@
       <div class="alert alert-danger" id="error"></div>
       {% csrf_token %}
       {% for field in form %}
-          {% if field.errors.as_text %} <div class="error">{{field.errors.as_text}}</div> {% endif %}
-            <div class='form-group'>
-              {{field.label_tag}}
+        {% if field.errors.as_text %} <div class="error">{{field.errors.as_text}}</div> {% endif %}
+          <div class='form-group'>
+            {{field.label_tag}}
               {{field}}
-            </div>
+          </div>
       {% endfor %}
       <div id='tests'></div>
       <button type="button" id="sbmt" class="btn btn-primary" onclick='getTests();'><b>Next</b></button>
