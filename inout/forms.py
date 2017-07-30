@@ -62,7 +62,8 @@ class RegistrationForm(forms.Form):
 class ActivateForm(forms.Form):
     act_code = forms.CharField(
         widget=forms.TextInput(attrs={ 'maxlength': 6, 'class': "activate-input form-control" }),
-        label=_("Activation Code")
+        label=_("Activation Code"),
+        required=False
     )
 
 	

@@ -9,34 +9,63 @@ from django import forms
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse		
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import views as auth_views
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.core import serializers
+from django.views.decorators.http import require_http_methods
 
 from contests.models import Contest, Problem, Solve, CommentC, CommentQ, Ranking
 from .global_vars import *
 from .models import Profile
 from .decorators import is_activated
 from .forms import RegistrationForm, ActivateForm, CodeForm
+from .helpers import issue_new_csrf_token
+
+INVALID_ACTIVATION_CODE = 'Invalid Code, contact admin if you didn\'t get the code.'
 
 
+@require_http_methods(['GET'])
 def clogin(request):
     """
     View for authentication page
     """
 
+    hide_section_states = { 'login': True, 'register': True, 'activate': True }
+    show_section = request.GET.get('showSection', '')
+
+    if show_section and show_section in hide_section_states.keys():
+        hide_section_states[show_section] = False
+    else:
+        hide_section_states['login'] = False
+        hide_section_states['register'], hide_section_states['activate'] = True, True
+
     if request.user.is_authenticated():
-        if(request.user.is_active):
+        if request.user.profile.activated:
             return redirect('inout:home')
         else:
-            return redirect('inout:activate')
-    else:
-        register_form = RegistrationForm()
-        return render(request, 'inout/auth.html', {'register_form': register_form})
+            hide_section_states['activate'] = False
+            hide_section_states['login'], hide_section_states['register'] = True, True
+    elif show_section == 'activate':
+        hide_section_states['activate'], hide_section_states['login'] = True, False
 
 
+    register_form = RegistrationForm()
+    activate_form = ActivateForm(initial={})
+
+    context = {
+        'register_form': register_form,
+        'activate_form': activate_form,
+        'hide_login': hide_section_states['login'],
+        'hide_register': hide_section_states['register'],
+        'hide_activate': hide_section_states['activate']
+    }
+
+    return render(request, 'inout/auth.html', context)
+
+
+@require_http_methods(['POST'])
 def authenticate_user(request):
     """
     View for authenticating a user
@@ -51,14 +80,20 @@ def authenticate_user(request):
         user = authenticate(username=username, password=password)
 
         if user is not None:
+            is_activated = user.profile.activated
             login(request, user)
-            resp = { 'success': True }
+
+            if not is_activated:
+                request = issue_new_csrf_token(request)
+
+            resp = { 'success': True, 'is_activated': is_activated }
         else:
             resp = { 'success': False, 'message': ['Enter a valid username/password.'] }
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
 
+@require_http_methods(['POST'])
 def register(request):
     """
     View for registration page
@@ -84,9 +119,13 @@ def register(request):
             user.profile.activation_code = code
 
             print(code)
-            
+
             user.profile.rating = 1200
             user.profile.save()
+
+            login(request, user)
+
+            request = issue_new_csrf_token(request)
 
             """
             send_mail('Activation Code',
@@ -99,42 +138,46 @@ def register(request):
             resp = { 'success': True }
         else:
             error_json = json.loads(form.errors.as_json())
-            message = [error_json[error][0]['message'] for error in error_json]
-            resp = { 'success': False, 'message': message }
+            codes = [error_json[error][0]['code'] for error in error_json]
+            messages = [error_json[error][0]['message'] for error in error_json]
+
+            if 'required' in codes:
+                messages = ['Required fields are absent.']
+
+            resp = { 'success': False, 'message': messages }
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
 
+@require_http_methods(['POST'])
 def activate(request):
     """
     View to activate user's account.
     """
+
     try:
         if not request.user.profile.activated:
             if request.method == 'POST':
                 form = ActivateForm(request.POST)
+
                 if form.is_valid():
-                    cd = request.user.profile.activation_code
-                    if(form.cleaned_data['act_code'] == cd):
-                        u = request.user
-                        u.profile.activated = True
-                        u.activation_code = ''
-                        u.profile.save()
-                        u.save()
+                    activation_code = request.user.profile.activation_code
+                    if form.cleaned_data['act_code'] == activation_code:
+                        user = request.user
+                        user.profile.activated = True
+                        user.activation_code = ''
+                        user.profile.save()
+                        user.save()
+
                         return redirect('/')
-                error = 'Invalid Code, contact admin if you didn\'t get the code.'
-                return render(request, 'inout/activate.html', {'form':form, 'error':error})
-            else:
-                return render(request, 'inout/activate.html', {'form':ActivateForm(initial={})})
+
+                messages.add_message(request, messages.ERROR, INVALID_ACTIVATION_CODE)
+                return redirect('/?showSection=activate')
         else:
             return redirect('/')
 
     except Exception as e:
         return redirect('inout:logout')
-
-
-def not_activated(request):
-    return render(request, 'inout/not_activated.html')
 
 
 @is_activated

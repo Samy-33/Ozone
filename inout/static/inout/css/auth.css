@@ -1,8 +1,15 @@
 .form-group {
     width: 80% !important;
 }
-.hide {
-    display: none;
+.hideMe {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1s;
+}
+.alert.alert-danger.hideMe {
+    padding: 0;
+    border: 0;
+    max-height: 1000px;
 }
 
 /* login css */
@@ -16,7 +23,7 @@
 }
 .login-button {
     width: 25%;
-    margin: 0 10px auto;
+    margin: 5px 10px auto;
 }
 
 /* register css */
@@ -34,4 +41,7 @@
 }
 .alert ul {
     padding-left: 5%;
+}
+.red-border {
+  border-bottom: 2px solid #Ff8088;
 }
