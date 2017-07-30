@@ -1,0 +1,27 @@
+.form-group{
+    width: 50% !important;
+}
+.questions{
+	background-color:aliceblue;
+	padding-left:20px;
+}
+
+.head-info{
+    text-align: center;
+    font-size: 200%;
+    font-family: Georgia;
+}
+
+.create-contest-form{
+    margin-left: 10%;
+    padding: 3em;
+}
+
+.vDateField, .vTimeField{
+    margin: 3% 0 0 10%;
+    border-radius: 5px;
+}
+
+.submit-btn{
+    margin-left:20%;
+}

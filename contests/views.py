@@ -225,14 +225,18 @@ def editq(request, code, question):
             return redirect('contests:editc', code=code)
 
         else:
-            return render(requset, 'contests/editq.html', {'form':form})
+            return render(requset, 'contests/editq.html', {'form':form,
+                                                           'con_code':contest.contest_code,
+                                                           'q_code':problem.code})
 
     form = EditProb({'name': problem.name,
                      'n_testfiles': problem.n_testfiles,
                      'time_lim': problem.time_lim,
                      'score': problem.score,
                      'text': problem.text})
-    return render(request, 'contests/editq.html', {'form':form})
+    return render(request, 'contests/editq.html', {'form':form,
+                                                   'con_code':contest.contest_code,
+                                                   'q_code':problem.code})
 
 
 @is_activated

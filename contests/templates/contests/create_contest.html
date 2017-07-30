@@ -1,36 +1,43 @@
 {% extends 'inout/base.html' %}
 {% load static %}
+{% block css %}
+  <link href="{% static 'inout/css/form-table.css' %}" rel=stylesheet type="text/css" />
+  <link href="{% static 'contests/css/create_contest.css' %}" rel='stylesheet' type='text/css' />
+{% endblock %}
+
 {% block content %}
-
-
-			<link href="{% static 'inout/css/form-table.css' %}" rel=stylesheet type="text/css" />
-			<link href='{% static "contests/css/create.css" %}' rel='stylesheet' type='text/css' />
-			<script src='{% static "contests/js/javascript.js" %}' type="text/javascript"></script>
-			Welcome {{ request.user.username }}, You can create your own contest here.
-			{% if done %}
-				Contest has been made, waiting for approval.
-			{% elif request.user.profile.tobecon == 1 %}
-				You have already created the contest
-			{% else %}
-			<br><br>
-			<div class="container">
-				<table>
-					<form method='post'>
+    {% if done %}
+      <div class="head-info">
+        Contest has been made, waiting for approval.
+      </div>
+    {% elif request.user.profile.tobecon == 1 %}
+      <div class="head-info">
+        You have already created the contest
+      </div>
+    {% else %}
+      <div class="head-info">
+        Contest Information
+      </div>
+        
+      <div class="col-md-8 col-sm-8 col-md-offset-3 col-sm-offset-3">
+					<form class="create-contest-form" method='post' action="{% url 'contests:create' %}" role='form'>
 						{% csrf_token %}
 						{% for field in form %}
-							<tr><td></td><td>{{field.errors.as_text}}</td></tr>
-							<tr><th style="float:left;">{{field.label_tag}}</th>
-								<td>
-									{{field}}
-								</td>
+							<div class="error">{% if field.errors %} {{ field.errors.as_text }} {% endif %}</div>
+							<div class="form-group">
+                              {{ field.label_tag }}
+				              {{ field }}
+				            </div>
 
-							</tr>
 						{% endfor %}
-						<tr><td><input type="submit" value='Create' /></td></tr>
+                        <button class="btn btn-primary submit-btn" type=submit > Create </button>
 					</form>
-				</table>
 			</div>
 
 			{% endif %}
+  </div>
+{% endblock %}
 
+{% block js %}
+  <script src='{% static "contests/js/javascript.js" %}' type="text/javascript"></script>
 {% endblock %}
