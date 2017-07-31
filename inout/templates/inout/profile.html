@@ -1,60 +1,66 @@
 {% extends 'inout/base.html' %}
 {% load static %}
-<!--{% block title %} User Information {% endblock %}
 
-<a href='{% url "inout home" %}' style="float:left;">Home</a>
-<a href='{%url "inout logout" %}' style="float:right;">Logout</a>
--->
-
-
+{% block css %}
+  <link href='{% static "inout/css/profile.css" %}' type='text/css' rel='stylesheet' />
+{% endblock %}
 
 {% block content %}
-			<link href='{% static "inout/css/profile.css" %}' type='text/css' rel='stylesheet' />
-			<script type="text/javascript" src='{% static "inout/js/javascript.js" %}'></script>
-			<div class='header'>
-			</div>
-			<h1 style="color:{{ user.profile.color }};">{{user.username}}</h1><br>
-			<h3>
-				<b>
-					Rating:{{ user.profile.rating }}
-				</b>
-			</h3>
-			
-			{% if request.user.is_staff or request.user.is_superuser %}
-				<button onclick='getCon()' >Contests</button>
-				<br><br>
-				<div id="cons"></div>
-			{% endif %}
-			<div style='float:right;'>
-				<table class='table table-bordered'>
-					<thead>
-						<th>Problem</th><th>Time</th>
-					</thead>
-					<tbody>
-						{% if solved %}
-							{% for prob in solved %}
-								<tr>
-								<th> <a style='color:green;' href="{% url 'contests:problem' code=prob.problem.contest.contest_code question=prob.problem.code %}">{{prob.problem.code}} </a></th>
-								<td>{{prob.time}}</td></tr>
-							{% endfor %}
-						<div class="pagination">
-							<span class="step-links">
-								{% if solved.has_previous %}
-									<a href="?page={{solved.previous_page_number}}">previous</a>
-								{% endif %}
-								<span class="current">
-									Page {{solved.number}} of {{solved.paginator.num_pages}}
-								</span>
-								{% if solved.has_next %}
-									<a href="?page={{solved.next_page_number}}">next</a>
-								{% endif %}
-							</span>
-						</div>
-						{% else %}
-							No submissions.
-						{% endif %}
-					</tbody>
-				</table>
-			</div>
+  <div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
+    <div class="profile-header">Your Profile</div>
+    <div>
+      <strong>Username:</strong> <div class="profile-username" style="color:{{ user.profile.color }}">{{ user.username }}</div>
+    </div>
+    <div>
+      <strong>Rating:</strong> <div class="profile-rating">{{ user.profile.rating }}</div>
+    </div>
 
+    {% if request.user.is_staff or request.user.is_superuser %}
+      <div class="contest-requests">
+        <button class="contest-request-btn btn btn-primary" id="get_contests">Contest Requests</button>
+        <div id="contests"></div>
+      </div>
+    {% endif %}
+
+    <div class="panel panel-warning">
+      <div class="panel-heading">Your Submissions</div>
+      {% if solved %}
+        <table class='table table-bordered'>
+          <thead>
+            <th>Problem</th><th>Time</th>
+          </thead>
+          <tbody>
+            {% for prob in solved %}
+              <tr>
+                <th>
+                  <a href="{% url 'contests:problem' code=prob.problem.contest.contest_code question=prob.problem.code %}" class="problem-url">{{ prob.problem.code }}</a>
+                </th>
+                <td>{{ prob.time }}</td>
+              </tr>
+            {% endfor %}
+
+            <div class="pagination">
+              <span class="step-links">
+                {% if solved.has_previous %}
+                  <a href="?page={{solved.previous_page_number}}">previous</a>
+                {% endif %}
+                <span class="current">
+                  Page {{solved.number}} of {{solved.paginator.num_pages}}
+                </span>
+                {% if solved.has_next %}
+                  <a href="?page={{solved.next_page_number}}">next</a>
+                {% endif %}
+              </span>
+            </div>
+          </tbody>
+        </table>
+      {% else %}
+        No submissions.
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+  <script type="text/javascript" src='{% static "inout/js/profile.js" %}'></script>
 {% endblock %}
