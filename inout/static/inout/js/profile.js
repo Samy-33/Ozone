@@ -1,48 +1,54 @@
-$(document).on('click', '#get_contests', function() {
-	$.ajax({
-		url: "allowcons/",
-		type: "GET",
-		dataType: "json",
-		success: function(contests){
-			var $contests = $('#contests');
+$(document).on('click', '#getContests', function() {
+	var $contests = $('#contests');
 
-			if(contests['status'] === 'failure'){
-				$contests.html("No contest requests.");
-				return;
+	if ($contests.html()) {
+		$('#contestRequests').remove();
+	}
+	else {
+		$.ajax({
+			url: "allowcons/",
+			type: "GET",
+			dataType: "json",
+			success: function(contests){
+				var $data = contests['contest_requests_html'];
+
+				if(!$data){
+					$contests.html("No contest requests.");
+					return;
+				}
+
+				$contests.html($data);
 			}
-
-			contests_html = "";
-			for (contest in contests){
-				var pk = contests[contest].pk,
-					name = contests[contest].fields.name,
-					start_date = contests[contest].fields.start_date,
-					end_date = contests[contest].fields.end_date;
-
-				contests_html += "<div id=" + pk + ">";
-				contests_html += "Name: " + name + "<br>";
-				contests_html += "Code: " + pk + "<br>";
-				contests_html += "Start: " + start_date + "<br>";
-				contests_html += "End: " + end_date + "<br>";
-				contests_html += "<button onclick='allow(1, " + pk +")'> Allow </button><button onclick='allow(0, "+ pk +")'> Reject </button>";
-				contests_html += "</div>";
-			}
-			$contests.html(contests_html);
-		},
-		error: function(e){
-			$contests.html("No contest requests.");
-		}
-	});
+		});
+	}
 });
 
+$(document).on('click', '[id^="allow"]', function() {
+	const $contest_id = this.id.replace('allow', '');
+	allow(this, 1, $contest_id);
+});
 
-function allow(a, pk) {
+$(document).on('click', '[id^="reject"]', function() {
+	const $contest_id = this.id.replace('reject', '');
+	allow(this, 0, $contest_id);
+});
+
+const allow = function(elem, is_allowed, contest_code) {
+	const data = {
+		is_allowed: is_allowed,
+		contest_code: contest_code
+	};
+
 	$.ajax({
-		type:'GET',
-		url:'allow/',
-		data: 'ag='+a+"&pk="+pk.id,
-		contentType: "application/json",
-		success:function(json){
-			alert("congratulations.");
+		url: 'allow/',
+		type: 'POST',
+		data: data,
+		dataType: "json",
+		success: function(data) {
+			if (data.success) {
+				var $elem = $('#' + elem.id);
+				$elem.parent().html('Successfully applied.');
+			}
 		},
 		error: function(e){
 			alert("Request Failure. Probably because you're not allowed or because of Internet Connection");

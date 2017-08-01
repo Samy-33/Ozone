@@ -18,3 +18,7 @@
 .problem-url {
     color: green;
 }
+.contest-allow-reject-btn {
+    width: 5em;
+    margin: 1% auto;
+}
