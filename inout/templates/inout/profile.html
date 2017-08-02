@@ -22,38 +22,40 @@
       </div>
     {% endif %}
 
-    <div class="panel panel-warning">
+    <div class="submission-section panel panel-warning">
       <div class="panel-heading">Your Submissions</div>
-      {% if solved %}
-        <table class='table table-bordered'>
-          <thead>
-            <th>Problem</th><th>Time</th>
-          </thead>
-          <tbody>
-            {% for prob in solved %}
-              <tr>
-                <th>
-                  <a href="{% url 'contests:problem' code=prob.problem.contest.contest_code question=prob.problem.code %}" class="problem-url">{{ prob.problem.code }}</a>
-                </th>
-                <td>{{ prob.time }}</td>
-              </tr>
-            {% endfor %}
+      {% if solved_problems %}
+        <center>
+          <table class='table table-bordered'>
+            <thead>
+              <th>Problem</th><th>Time</th>
+            </thead>
+            <tbody>
+              {% for prob in solved_problems %}
+                <tr>
+                  <td>
+                    <a href="{% url 'contests:problem' code=prob.problem.contest.contest_code question=prob.problem.code %}" class="problem-url">{{ prob.problem.code }}</a>
+                  </td>
+                  <td>{{ prob.time }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
 
-            <div class="pagination">
-              <span class="step-links">
-                {% if solved.has_previous %}
-                  <a href="?page={{solved.previous_page_number}}">previous</a>
-                {% endif %}
-                <span class="current">
-                  Page {{solved.number}} of {{solved.paginator.num_pages}}
-                </span>
-                {% if solved.has_next %}
-                  <a href="?page={{solved.next_page_number}}">next</a>
-                {% endif %}
+          <div class="pagination panel-footer">
+            <span class="step-links">
+              {% if solved.has_previous %}
+                <a href="?page={{solved.previous_page_number}}">Previous</a>
+              {% endif %}
+              <span class="current">
+                Page {{ solved_problems.number }} of {{ solved_problems.paginator.num_pages }}
               </span>
-            </div>
-          </tbody>
-        </table>
+              {% if solved.has_next %}
+                <a href="?page={{solved.next_page_number}}">Next</a>
+              {% endif %}
+            </span>
+          </div>
+        </center>
       {% else %}
         No submissions.
       {% endif %}

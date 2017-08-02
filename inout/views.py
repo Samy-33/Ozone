@@ -250,15 +250,15 @@ def profile(request, username):
     """
     Profile View, information about the user
     """
-    u = get_object_or_404(User, username=username)
-    solved_list = Solve.objects.filter(user=u).order_by('-time')
-    paginator=Paginator(solved_list, 10)
-    page=request.GET.get('page')
-    try:
-        solved = paginator.page(page)
-    except:
-        solved = paginator.page(1)
-    return render(request, 'inout/profile.html', {'user':u, 'solved':solved})
+
+    user = get_object_or_404(User, username=username)
+    solved_problems_qs = Solve.objects.filter(user=user).order_by('-time')
+
+    paginator = Paginator(solved_problems_qs, 10)
+    page = request.GET.get('page', 1)
+    solved_problems = paginator.page(page)
+
+    return render(request, 'inout/profile.html', { 'user': user, 'solved_problems': solved_problems })
 
 
 def is_alright(string, lang):

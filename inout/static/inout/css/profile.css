@@ -22,3 +22,6 @@
     width: 5em;
     margin: 1% auto;
 }
+th, td {
+    text-align: center;
+}
