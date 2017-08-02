@@ -1,21 +1,3 @@
-
-function getTests(){
-	
-	var n = parseInt(document.getElementById('id_n_testfiles').value);
-	document.getElementsByTagName("form")[0].setAttribute('enctype', "multipart/form-data");
-	var tests = document.getElementById("tests");
-	for(var i = 0; i < n; i++){
-		html = "<tr><td> Input "+i+": </td><td><input name=in"+i+".txt required type=file /></td><td> Output "+i+": </td><td><input name=out"+i+".txt required type=file /></td></tr>";
-		$('#tests').append(html);
-	}
-	var button = document.getElementById("sbmt");
-	button.removeAttribute("onclick");
-	button.setAttribute("type", "submit");
-	button.setAttribute("form", "addq");
-	button.value="submit";
-	button.innerHTML = "Submit";
-}
-
 function del(code){
 	var answer = confirm("Are you sure to delete the question "+code+"?");
 	if(answer){
