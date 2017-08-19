@@ -1,0 +1,15 @@
+<div id="contestRequests">
+  {% for contest in contests %}
+    <div class="contest-request-panel panel panel-default" id="{{ contest.pk }}">
+      <div class="panel-body">
+        <strong>Name:</strong> {{ contest.name }}<br>
+        <strong>Contest Code:</strong> {{ contest.contest_code }}<br>
+        <strong>Start:</strong> {{ contest.start_date }}<br>
+        <strong>End:</strong> {{ contest.end_date }}<br>
+
+        <button class="contest-allow-reject-btn btn btn-success" id="allow{{ contest.pk }}">Allow</button>
+        <button class="contest-allow-reject-btn btn btn-danger" id="reject{{ contest.pk }}">Reject</button>
+      </div>
+    </div>
+  {% endfor %}
+</div>

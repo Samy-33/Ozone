@@ -14,7 +14,9 @@ from django.contrib.auth import authenticate, login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.template import loader
 
 from contests.models import Contest, Problem, Solve, CommentC, CommentQ, Ranking
 from .global_vars import *
@@ -194,41 +196,53 @@ def index(request):
 @is_activated
 def give_contests(request):
     """
-    A view which provides contests which are requested to the moderator
+    Returns html code containing contest requests
     """
-    try:
+
+    if request.is_ajax() and (request.user.is_staff or request.user.is_superuser):
         contests = Contest.objects.filter(allowed=0)
-        if len(contests)==0:
-            return JsonResponse({'status':'failure'}, status=200)
-        contest_requests = serializers.serialize('json', contests)
-        return HttpResponse(contest_requests, content_type='application/json')
+        contest_request_template = loader.get_template('inout/contest_requests.html')
+        contest_requests_html = contest_request_template.render({ 'contests': contests })
+        resp = { 'contest_requests_html': contest_requests_html }
+    else:
+        resp = { 'success': False, 'message': 'Only XMLHttp request allowed by staff/superusers' }
 
-    except Exception as e:
-        return JsonResponse({'status':'failure'}, status=404)
-	
+    return HttpResponse(json.dumps(resp), content_type='application/json')
 
+
+@csrf_exempt
 @is_activated
 def allow(request):
     """
     The view to allow or reject a contest
     Only accessible by a staff or superuser.
     """
-    try:
-        if(request.method == 'GET'):
-            pp = int(request.GET.get('ag'))
-            c = Contest.objects.get(pk=request.GET.get('pk'))
-            if pp == 1:
-                c.allowed = 1
-                c.save()
-                return JsonResponse({'done':'true'}, status=200)
-            else:
-                usr = c.admin
-                usr.profile.tobecon = False
-                usr.save()
-                c.delete()
-                return JsonResponse({'done':'true'}, status=200)
-    except Exception as e:
-        return JsonResponse({'done':'false'}, status=404)
+
+    if request.is_ajax() and (request.user.is_staff or request.user.is_superuser):
+        is_allowed = int(request.POST.get('is_allowed', -1))
+        contest_code = request.POST.get('contest_code', None)
+
+        if is_allowed not in [1, 0] or contest_code is None:
+            resp = { 'success': False, 'message': 'Invalid post parameters' }
+
+        else:
+            contest = Contest.objects.get(contest_code=contest_code)
+
+            if is_allowed == 1:
+                contest.allowed = 1
+                contest.save()
+
+            elif is_allowed == 0:
+                user = contest.admin
+                user.profile.tobecon = False
+                user.save()
+                contest.delete()
+
+            resp = { 'success': True }
+    else:
+        resp = { 'success': False, 'message': 'Only XMLHttp request allowed by staff/superusers' }
+
+    return HttpResponse(json.dumps(resp), content_type='application/json')
 
 
 @is_activated
@@ -236,15 +250,15 @@ def profile(request, username):
     """
     Profile View, information about the user
     """
-    u = get_object_or_404(User, username=username)
-    solved_list = Solve.objects.filter(user=u).order_by('-time')
-    paginator=Paginator(solved_list, 10)
-    page=request.GET.get('page')
-    try:
-        solved = paginator.page(page)
-    except:
-        solved = paginator.page(1)
-    return render(request, 'inout/profile.html', {'user':u, 'solved':solved})
+
+    user = get_object_or_404(User, username=username)
+    solved_problems_qs = Solve.objects.filter(user=user).order_by('-time')
+
+    paginator = Paginator(solved_problems_qs, 10)
+    page = request.GET.get('page', 1)
+    solved_problems = paginator.page(page)
+
+    return render(request, 'inout/profile.html', { 'user': user, 'solved_problems': solved_problems })
 
 
 def is_alright(string, lang):

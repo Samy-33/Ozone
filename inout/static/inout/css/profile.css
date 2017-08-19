@@ -1,4 +1,27 @@
-.header{
-	/*background-color:aqua;*/
-	font-size:16px;
+.profile-header {
+	font-size: 3rem;
+    text-align: center;
+    color: #444;
+}
+.profile-username, .profile-rating {
+    font-size: 1.5rem;
+    text-align: left;
+    display: inline-block;
+    margin: 1% auto;
+}
+.contest-requests {
+    margin: 1% 0 3% 0;
+}
+.contest-request-btn {
+    margin: 1% auto;
+}
+.problem-url {
+    color: green;
+}
+.contest-allow-reject-btn {
+    width: 5em;
+    margin: 1% auto;
+}
+th, td {
+    text-align: center;
 }
