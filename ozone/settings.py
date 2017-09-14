@@ -23,17 +23,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '$-hl1_gvm@=83o_dg)*bxz(n$m8n)=1fyafwil+kp(t+xvy&%+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['172.27.16.193']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-	'inout.apps.InoutConfig',
-	'practice.apps.PracticeConfig',
-	'contests.apps.ContestsConfig',
+    'inout.apps.InoutConfig',
+    'practice.apps.PracticeConfig',
+    'contests.apps.ContestsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,7 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 #STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),]
 STATIC_URL = '/static/'
-STATIC_ROOT = '/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 LOGIN_REDIRECT_URL = '/home/'
 LOGIN_URL = '/login'
 APPEND_SLASH = False
@@ -132,6 +132,8 @@ EMAIL_HOST_USER='saket.patel@iiitdmj.ac.in'
 EMAIL_HOST_PASSWORD='xxxxxxxx'
 #EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
+CODEDIR = '/home/saras/Ozone'
+
 
 if DEBUG:
     MIDDLEWARE_CLASSES += (

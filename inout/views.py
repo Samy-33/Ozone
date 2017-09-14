@@ -7,7 +7,7 @@ from subprocess import *
 
 from django import forms
 from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse		
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -343,15 +343,14 @@ def code_edit(request):
         if not is_alright(code, lang):
             return HttpResponse('Invalid Code')
 
-        code_path = os.path.join(os.getcwd(),
-                                 f'tmp/{request.user.username}/code{extensions[lang]}')
-        input_file = os.path.join(os.getcwd(),
-                                  f'tmp/{request.user.username}/inp.txt')
+        from ozone.settings import CODEDIR
+        code_path = os.path.join(CODEDIR, f'tmp/{request.user.username}/code{extensions[lang]}')
+        input_file = os.path.join(CODEDIR, f'tmp/{request.user.username}/inp.txt')
 
-        with open(code_path, 'w') as file:
+        with open(code_path, 'w+') as file:
             file.write(request.POST.get('code'))
 
-        with open(input_file, 'w') as file:
+        with open(input_file, 'w+') as file:
             file.write(request.POST.get('inpt'))
 
         if 'python' in lang:

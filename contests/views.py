@@ -19,6 +19,8 @@ import datetime
 import pytz
 import subprocess as sb
 
+from ozone.settings import CODEDIR
+
 
 @is_activated
 def index(request):
@@ -120,7 +122,7 @@ def editc(request, code):
 
 def create_test_files(request, problem, edit_problem=False):
     import os
-    present_directory = os.getcwd()
+    present_directory = CODEDIR
     path = os.path.join(present_directory, f'tmp/problems/{problem.code}')
     if edit_problem:
         import shutil
@@ -346,7 +348,8 @@ def compile_code(request, problem, code_info):
         compile_cmd = 'gcc {} -o {}'.format(code_info['codepath'],
                                             code_info['outputpath'])
     else:
-        compile_cmd = f'javac tmp/{request.user.username}/{problem.code}/code.java'
+        ddir = os.path.join(CODEDIR,  f'tmp/{request.user.username}/{problem.code}/code.java')
+        compile_cmd = f'javac {ddir}'
 
     try:
         ## Not secure
@@ -394,12 +397,12 @@ def submit(request, code):
 
         import os
 
-        path_for_problem = os.path.join(os.getcwd(), f'tmp/{request.user.username}/{code}')
+        path_for_problem = os.path.join(CODEDIR, f'tmp/{request.user.username}/{code}')
 
         if not os.path.exists(path_for_problem):
             os.makedirs(path_for_problem)
 
-        path_for_tests = os.path.join(os.getcwd(), f'tmp/problems/{code}')
+        path_for_tests = os.path.join(CODEDIR, f'tmp/problems/{code}')
         codepath = os.path.join(path_for_problem, 'code{}'.format(extensions[language]))
         outputpath = os.path.join(path_for_problem, output[language])
         code_info = {
@@ -471,8 +474,8 @@ def check(user, problem, n):
     """
     try:
         import os
-        user_output = open(os.path.join(os.getcwd(), f'tmp/{user}/{problem}/uout{n}.txt'), 'r')
-        exp_output = open(os.path.join(os.getcwd(), f'tmp/problems/{problem}/out{n}.txt'), 'r')
+        user_output = open(os.path.join(CODEDIR, f'tmp/{user}/{problem}/uout{n}.txt'), 'r')
+        exp_output = open(os.path.join(CODEDIR, f'tmp/problems/{problem}/out{n}.txt'), 'r')
         user_line, expected_line = '1', '1'
         while user_line != '' or expected_line != '':
             user_line = user_output.readline().strip()
@@ -544,7 +547,7 @@ def deleteq(request, code):
         import os
         try:
             import shutil
-            shutil.rmtree(f'./tmp/problems/{code}')
+            shutil.rmtree(os.path.join(CODEDIR, f'tmp/problems/{code}'))
         except:
             pass
     else:
@@ -584,7 +587,7 @@ def deletec(request, contest):
         request.user.profile.save()
         import os, shutil
         for problem in con.problem_set.all():
-            path_to_remove = os.path.join(os.getcwd(), f'tmp/problems/{problem.code}')
+            path_to_remove = os.path.join(CODEDIR, f'tmp/problems/{problem.code}')
             if os.path.exists(path_to_remove):
                 shutil.rmtree(path_to_remove)
         con.delete()
