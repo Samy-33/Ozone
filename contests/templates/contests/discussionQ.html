@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 	<script src="{% static 'contests/js/javascript.js' %}" type="text/javascript"></script>
-	<h2><center>Contest: <a href="{% url 'contests:contest' code=prob.contest.contest_code %}">{{prob.contest.name}}</a></center></h2>
+	<h2><center>Contest: <a href="{% url 'contests:contest' contest=prob.contest.contest_code %}">{{prob.contest.name}}</a></center></h2>
 
 		<h4>
 			<center>
-			Problem: <a href="% url 'contests:problem' code=con.contest_name question=prob.code %"> {{prob.name}}</a>
+			Problem: <a href="% url 'contests:problem' contest=con.contest_name question=prob.code %"> {{prob.name}}</a>
 			</center>
 		</h4>
 
@@ -62,7 +62,7 @@
 							<a href="?page={{comments.next_page_number}}">next</a>
 						{% endif %}
 					</span>
-				
+
 				</div>
 			</tbody>
 		</table>

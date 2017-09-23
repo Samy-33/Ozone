@@ -27,7 +27,7 @@
 
 	</script>
 	<center><h1>{{ques.name}}</h1><br><b>{{contest.contest_code}}</b>:{{ques.code}}</center><br>
-	<span style="float:right;"><a href="{% url 'contests:boardQ' code=ques.code %}">Discussion</a></span><br>
+	<span style="float:right;"><a href="{% url 'contests:boardQ' question=ques.code %}">Discussion</a></span><br>
 	<dl>
 		<dt>
 		<h3>
@@ -38,7 +38,7 @@
 			<div class="row"><pre>{{ques.text}}</pre></div></div>
 		</dd><br><br>
 		<b><i>Time Limit:</i></b><p>{{ques.time_lim}}</p><br><br>
-		
+
 	</dl>
 	<center>
 		<div id="editor"></div>

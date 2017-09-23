@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '$-hl1_gvm@=83o_dg)*bxz(n$m8n)=1fyafwil+kp(t+xvy&%+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['172.27.16.193']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -132,7 +132,7 @@ EMAIL_HOST_USER='saket.patel@iiitdmj.ac.in'
 EMAIL_HOST_PASSWORD='xxxxxxxx'
 #EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
-CODEDIR = '/home/saras/Ozone'
+CODEDIR = '/home/saket/Documents/django-tut/Ozone'
 
 
 if DEBUG:

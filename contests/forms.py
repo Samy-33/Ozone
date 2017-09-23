@@ -42,21 +42,22 @@ class CreateContest(forms.Form):
         return self.cleaned_data['end_date']
 
 class Prob(forms.ModelForm):
-    
+
     def __init__(self, *args, **kwargs):
         super(Prob, self).__init__(*args, **kwargs)
         for field in self.fields:
             if field == 'tags':
                 continue
             self.fields[field].widget.attrs['class'] = 'form-control'
-    
+
     try:
         choices = tuple((tag.id, tag.name) for tag in Tag.objects.all())
+        print(choices)
     except:
         choices = []
     text = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
     tags = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=choices)
-        
+
     class Meta:
         model = Problem
         fields=['code', 'name', 'n_testfiles', 'time_lim', 'score', 'text']
@@ -69,12 +70,12 @@ class Prob(forms.ModelForm):
             return self.cleaned_data['code']
 
 class EditProb(forms.ModelForm):
-    
+
     def __init__(self, *args, **kwargs):
         super(EditProb, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
-    
+
     text = forms.CharField(widget=forms.Textarea)
 
     class Meta:

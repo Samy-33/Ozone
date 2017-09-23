@@ -71,7 +71,7 @@ def create(request):
             request.user.profile.tobecon = True
             request.user.save()
 
-            return redirect('contests:contest', code=c.contest_code)
+            return redirect('contests:contest', contest=c.contest_code)
         else:
             return render(request, 'contests/create_contest.html', {'form':form, 'done':False})
     else:
@@ -80,7 +80,7 @@ def create(request):
 
 
 @is_activated
-def contest(request, code):
+def contest(request, contest):
     """
     View which provides the main view of a particular contest
     Variables
@@ -88,7 +88,7 @@ def contest(request, code):
     # dt: difference between current time and start time of contest
     # pp: if contest has passed or not.
     """
-    con = get_object_or_404(Contest, Q(contest_code=code))
+    con = get_object_or_404(Contest, Q(contest_code=contest))
 
     dt = aware(datetime.datetime.now())-con.start_date
     if dt.days < 0 or dt.seconds < 0:
@@ -99,7 +99,7 @@ def contest(request, code):
 
 
 @is_activated
-def editc(request, code):
+def editc(request, contest):
     """
     This view is to edit a particular contest
     Variables
@@ -107,7 +107,7 @@ def editc(request, code):
     # allow_edit: Allow edit if allow_edit is True means allow only if contest
                   is ongoing or upcoming
     """
-    contest = get_object_or_404(Contest, Q(contest_code=code)
+    contest = get_object_or_404(Contest, Q(contest_code=contest)
                             &Q(end_date__gte=datetime.datetime.now()))
     if contest.admin == request.user:
         if contest.end_date >= aware(datetime.datetime.now()):
@@ -151,7 +151,7 @@ def create_tag_problems(form, problem):
             print(e.decode('utf-8'))
 
 @is_activated
-def addq(request, code):
+def addq(request, contest):
     """
     View to add a new question to a particular contest
     Variables
@@ -160,7 +160,7 @@ def addq(request, code):
     """
     if(request.method=='POST'):
         try:
-            con = Contest.objects.get(contest_code=code)
+            con = Contest.objects.get(contest_code=contest)
             form = Prob(request.POST)
             if form.is_valid():
                 pb = Problem.objects.create(
@@ -177,7 +177,7 @@ def addq(request, code):
                 create_test_files(request, pb)
                 create_tag_problems(form, pb)
 
-                return redirect('contests:editc', code=code)
+                return redirect('contests:editc', contest=contest)
             else:
                 return render(request, 'contests/addq.html', {'form':form})
 
@@ -188,14 +188,14 @@ def addq(request, code):
 
 
 @is_activated
-def editq(request, code, question):
+def editq(request, contest, question):
     """
     This view is to allow editing of a problem
     Variables
     # contest: Contest in which the problem belongs
     # problem: The problem which is to be edited
     """
-    contest = get_object_or_404(Contest, contest_code=code)
+    contest = get_object_or_404(Contest, contest_code=contest)
     problem = get_object_or_404(Problem, code=question)
 
     if request.method=='POST':
@@ -214,7 +214,7 @@ def editq(request, code, question):
             """
             create_test_files(request, problem, edit_problem=True)
 
-            return redirect('contests:editc', code=code)
+            return redirect('contests:editc', contest=contest)
 
         else:
             context = {
@@ -235,14 +235,16 @@ def editq(request, code, question):
 
 
 @is_activated
-def problem(request, code, question):
+def problem(request, contest, question):
     """
     This view is to show data about a particular problem and allow submission
     Variables
     # con: Contest in which problem belongs
     # ques: The problem
     """
-    contest = get_object_or_404(Contest, contest_code=code)
+    contest = get_object_or_404(Contest, contest_code=contest)
+    if contest.start_date > aware(datetime.datetime.now()) and request.user != contest.admin:
+        return redirect('contests:contest', contest=contest.contest_code)
     problem = get_object_or_404(Problem, code=question)
     return render(request, 'contests/problem.html', {'contest':contest, 'ques':problem})
 
@@ -261,10 +263,11 @@ def should_update_solved(request, problem):
 
 def run_code(request, problem, code_info, test_number):
     language = code_info['language']
+    import os
     try:
         if language == 'java':
 
-            code_info['outputpath'] = f'tmp/{request.user.username}/{q.code} Main'
+            code_info['outputpath'] = os.path.join(CODEDIR, f'tmp/{request.user.username}/{problem.code}') + ' Main'
 
             run_cmd = f'timeout {problem.time_lim}s time ' \
                       f'java -cp {code_info["outputpath"]} ' \
@@ -348,7 +351,8 @@ def compile_code(request, problem, code_info):
         compile_cmd = 'gcc {} -o {}'.format(code_info['codepath'],
                                             code_info['outputpath'])
     else:
-        ddir = os.path.join(CODEDIR,  f'tmp/{request.user.username}/{problem.code}/code.java')
+        import os
+        ddir = os.path.join(CODEDIR, f'tmp/{request.user.username}/{problem.code}/code.java')
         compile_cmd = f'javac {ddir}'
 
     try:
@@ -364,7 +368,7 @@ def compile_code(request, problem, code_info):
 
 @csrf_protect
 @is_activated
-def submit(request, code):
+def submit(request, question):
     """
     The view which submits the code and returns verdict as JSON object
     Variables
@@ -393,16 +397,16 @@ def submit(request, code):
 
         maximum_time_taken = 0.0
 
-        q = get_object_or_404(Problem, code=code)
+        q = get_object_or_404(Problem, code=question)
 
         import os
 
-        path_for_problem = os.path.join(CODEDIR, f'tmp/{request.user.username}/{code}')
+        path_for_problem = os.path.join(CODEDIR, f'tmp/{request.user.username}/{question}')
 
         if not os.path.exists(path_for_problem):
             os.makedirs(path_for_problem)
 
-        path_for_tests = os.path.join(CODEDIR, f'tmp/problems/{code}')
+        path_for_tests = os.path.join(CODEDIR, f'tmp/problems/{question}')
         codepath = os.path.join(path_for_problem, 'code{}'.format(extensions[language]))
         outputpath = os.path.join(path_for_problem, output[language])
         code_info = {
@@ -442,12 +446,12 @@ def submit(request, code):
             if isinstance(execution_verdict, JsonResponse):
                 if should_update_solved(request, q):
                     addWA(request, q)
-                removeDir(request, code)
+                removeDir(request, question)
                 return execution_verdict
 
             maximum_time_taken = max(maximum_time_taken, execution_verdict)
 
-        removeDir(request, code)
+        removeDir(request, question)
 
         if should_update_solved(request, q):
             addAC(request, q)
@@ -464,7 +468,7 @@ def removeDir(request, code):
     utility function to remove temporary directory created
     """
     import os, shutil
-    path_to_clear = os.path.join(os.getcwd(), f'tmp/{request.user.username}/{code}')
+    path_to_clear = os.path.join(CODEDIR, f'tmp/{request.user.username}/{code}')
     if(os.path.exists(path_to_clear)):
         shutil.rmtree(path_to_clear)
 
@@ -534,20 +538,20 @@ def addWA(request, q):
 """
 
 @is_activated
-def deleteq(request, code):
+def deleteq(request, question):
     """
     This view is to delete a question
     Variables
     # q: The problem to be deleted
     """
-    q = get_object_or_404(Problem, code=code)
+    q = get_object_or_404(Problem, code=question)
 
     if q.contest.admin == request.user:
         q.delete()
         import os
         try:
             import shutil
-            shutil.rmtree(os.path.join(CODEDIR, f'tmp/problems/{code}'))
+            shutil.rmtree(os.path.join(CODEDIR, f'tmp/problems/{question}'))
         except:
             pass
     else:
@@ -596,8 +600,8 @@ def deletec(request, contest):
 
 
 @is_activated
-def get_time(request, code):
-    contest = get_object_or_404(Contest, contest_code=code)
+def get_time(request, contest):
+    contest = get_object_or_404(Contest, contest_code=contest)
 
     return JsonResponse({'start':contest.start_date,
                          'end':contest.end_date}, status=200)
@@ -629,7 +633,7 @@ def boardC(request, contest):
 
 
 @is_activated
-def boardQ(request, code):
+def boardQ(request, question):
     """
     View for main comments on the problem
     Variables
@@ -637,12 +641,13 @@ def boardQ(request, code):
     # comment_list: The comments in the contests
     # comments: paginated comments
     """
-    prob = get_object_or_404(Problem, code=code)
+    prob = get_object_or_404(Problem, code=question)
     if request.method=='POST':
         CommentQ.objects.create(
             problem=prob,
             user=request.user,
-            text = request.POST.get('com'),)
+            text = request.POST.get('com'),
+        )
     comments_list = CommentQ.objects.filter(Q(problem=prob)).order_by('-timestamp')
     paginator = Paginator(comments_list, 10)
     page = request.GET.get('page')
@@ -682,7 +687,7 @@ def convQ(request, question, pk):
 
 
 @is_activated
-def convC(request, code, pk):
+def convC(request, contest, pk):
     """
     View to show responses to a particular comment on a Contest
     Variables
@@ -690,7 +695,7 @@ def convC(request, code, pk):
     # con: Contest on which these conversations are made
     """
     main_comment = get_object_or_404(CommentC, id=pk)
-    con = get_object_or_404(Contest, contest_code=code)
+    con = get_object_or_404(Contest, contest_code=contest)
     conversation_list = ConvC.objects.filter(Q(comment=main_comment)).order_by('timestamp')
     if request.method=='POST':
         ConvC.objects.create(

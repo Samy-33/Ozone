@@ -36,10 +36,10 @@
                   <span><i class = "fa fa-hand-o-left"></i></span>
                   <span><a href="javascript:window.history.back();"> Go back</a></span>
                 </div>
-                <a href='{% url "inout:home" %}'>Home</a> | 
-                <a href='/contests/'>Contests</a> | 
-                <a href="{% url 'inout:profile' username=request.user.username %}">Profile</a> | 
-                <a href="{% url 'inout:code' %}">Code</a> | 
+                <a href='{% url "inout:home" %}'>Home</a> |
+                <a href='/contests/'>Contests</a> |
+                <a href="{% url 'inout:profile' username=request.user.username %}">Profile</a> |
+                <a href="{% url 'inout:code' %}">Code</a> |
                 <a href="{% url 'practice:index'%}">Practice</a>
                 <a href="{% url 'inout:logout' %}" class="logout-link">Logout</a>
                 <hr>
@@ -58,6 +58,5 @@
     </div>
   </body>
 </html>
-
 {% block js %}
 {% endblock %}

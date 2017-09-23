@@ -264,12 +264,11 @@ def profile(request, username):
 def is_alright(string, lang):
     """
     Heuristic check of some malicious intentions of user in code
-
     """
     string = string.lower()
 
     if 'python' in lang:
-        if 'system(' in string or 'popen' in string:
+        if 'import os' in string or 'system(' in string or 'popen' in string:
             return False
         else:
             return True
@@ -294,8 +293,8 @@ def calculate_rating(old_rating, expected_rating, actual_rating, k_factor):
 
 
 @is_activated
-def update(request, code):
-    contest = get_object_or_404(Contest, contest_code=code)
+def update(request, contest):
+    contest = get_object_or_404(Contest, contest_code=contest)
     if contest.updated or not contest.rated:
         return JsonResponse({'status':'IC', 'error':'invalid contest'}, status=200)
     users = Ranking.objects.filter(contest=contest)
@@ -374,16 +373,16 @@ def code_edit(request):
             if lang !='java':
                 compile_cmd = cmd[lang][0]%(code_path, output_path)
             else:
-                compile_cmd = f'javac tmp/{request.user.username}/code.java'
+                compile_cmd = f'javac {CODEDIR}/tmp/{request.user.username}/code.java'
 
             try:
                 ps = check_output(compile_cmd, shell=True, stderr=STDOUT).decode('utf-8')
 
-                if lang!='java':
+                if lang != 'java':
                     run_cmd = "timeout 5s "+((cmd[lang][1]%(output_path, input_file)))
 
                 else:
-                    run_cmd = "java -cp %s < %s"%(os.path.join(os.getcwd(),"tmp/%s Main"%request.user.username), input_file)
+                    run_cmd = "java -cp %s < %s"%(os.path.join(CODEDIR,"tmp/%s Main"%request.user.username), input_file)
 
                 ps = check_output(run_cmd, shell=True, stderr=STDOUT).decode('utf-8')
                 return HttpResponse(ps)

@@ -18,17 +18,17 @@
 		<p>You can't edit this contest</p>
 	{% elif contest.problem_set.all %}
 		<script src="{% static 'contests/js/javascript.js' %}" type="text/javascript" ></script>
-		
+
 		<table class="table table-bordered"><tbody>
 			{% for prob in contest.problem_set.all %}
 				<tr>
 					<td>
-						<a href="{% url 'contests:problem' code=contest.contest_code question=prob.code%}">
+						<a href="{% url 'contests:problem' contest=contest.contest_code question=prob.code%}">
 							{{prob.code}}
 						</a>
 					</td>
 					<td>
-						<a href="{% url 'contests:editq' code=contest.contest_code question=prob.code %}">
+						<a href="{% url 'contests:editq' contest=contest.contest_code question=prob.code %}">
 							<button class="btn btn-primary">
 								Edit
 							</button>

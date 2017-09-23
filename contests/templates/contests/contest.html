@@ -19,7 +19,7 @@
 						{% if pp %}
 							<p>
 								<span>
-									<a style="float:right;" href="{% url 'contests:editc' code=contest.contest_code %}">
+									<a style="float:right;" href="{% url 'contests:editc' contest=contest.contest_code %}">
 										<button>
 											Edit Contest
 										</button>
@@ -35,7 +35,7 @@
 						<button class="btn btn-default" style="float:left;">
 							Ranking
 						</button>
-					</a> 
+					</a>
 					<br><br><hr>
 				{% endif %}
 				<br><br>
@@ -67,7 +67,7 @@
 									<div class="ques">
 										<h4>
 											<td>
-												<a href="{% url 'contests:problem' code=contest.contest_code question=ques.code %}">
+												<a href="{% url 'contests:problem' contest=contest.contest_code question=ques.code %}">
 													{{ques.name}}
 												</a>
 											</td>

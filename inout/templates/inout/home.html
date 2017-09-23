@@ -21,13 +21,13 @@
 								{% for conv in convc %}
 									<tr>
 										<td>
-											<a href="{% url 'contests:convC' code=conv.contest.contest_code pk=conv.pk%}">{{conv.text}}</a>
+											<a href="{% url 'contests:convC' contest=conv.contest.contest_code pk=conv.pk%}">{{conv.text}}</a>
 										</td>
 										<td>
 											<a href="{% url 'inout:profile' username=conv.user.username %}">{{conv.user.username}}</a>
 										</td>
 										<td>
-											<a href="{% url 'contests:contest' code=conv.contest.contest_code %}">{{conv.contest.contest_code}}</a>
+											<a href="{% url 'contests:contest' contest=conv.contest.contest_code %}">{{conv.contest.contest_code}}</a>
 										</td>
 									</tr>
 								{% endfor %}
@@ -54,7 +54,7 @@
 											<a href="{% url 'inout:profile' username=conv.user.username %}">{{conv.user.username}}</a>
 										</td>
 										<td>
-											<a href="{% url 'contests:problem' code=conv.problem.contest.contest_code question=conv.problem.code %}">{{conv.problem.code}}</a>
+											<a href="{% url 'contests:problem' contest=conv.problem.contest.contest_code question=conv.problem.code %}">{{conv.problem.code}}</a>
 										</td>
 									</tr>
 								{% endfor %}

@@ -38,14 +38,15 @@ def create_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
         import os
-        path = os.path.join(os.getcwd(), "tmp/%s"%instance.username)
+        from ozone.settings import CODEDIR
+        path = os.path.join(CODEDIR, "tmp/%s"%instance.username)
         if(not os.path.exists(path)):
             os.mkdir(path)
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
     instance.profile.save()
-	
+
 class solved(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     problem = models.OneToOneField(Problem, on_delete=models.CASCADE)
@@ -53,4 +54,3 @@ class solved(models.Model):
     time_taken=models.DecimalField(null=False, blank=False, max_digits=5, decimal_places=2)
     #Add memory limit too
     #	memory_used=models.DecimalField(null=False, blank=False, max_digits=10, decimal_places=2)
-	
