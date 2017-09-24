@@ -1,0 +1,40 @@
+<style>
+    .custom-container{
+        padding: 10px;
+        border: 2px black solid;
+    }
+    .big-header{
+        font-size:25px;
+        color: red;
+    }
+    .small-header{
+        font-size: 22px;
+        color: blue;
+        margin-left: 10px;
+    }
+    .rules{
+        margin-left: 15px;
+    }
+
+</style>
+<div class='container custom-container'>
+    <div class='big-header'>Rules</div><hr>
+        <div class='small-header'> Languages </div>
+        <div class='rules'>
+            <ul>
+                <li> CPP: CPP14 is used
+                <li> Python: Python2.7 and Python3.5
+                <li> Java: Java8 is used
+            </ul>
+        </div>
+        <div class='small-header'> More </div>
+        <div class='rules'>
+            <ul>
+                <li> While using Java, always name your main class as "Main", otherwise your code will not run.
+                <li> Don't mess with the system otherwise you will be blocked.
+                <li> If you find bug kindly report it <a href="{% url 'inout:feedback' %}">here</a>
+                <li> Don't cheat while a contest is live. You will be blocked if found involved in undesired activity.
+                <li> Don't help others while a contest is live.
+            </ul>
+        </div>
+</div>

@@ -392,3 +392,8 @@ def code_edit(request):
                 return HttpResponse(retdata)
 
     else: return render(request, 'inout/code-edit.html', {'form':form})
+
+
+@is_activated
+def feedback(request):
+    pass

@@ -20,6 +20,8 @@ class CreateContest(forms.Form):
             contest = Contest.objects.get(contest_code=self.cleaned_data['contest_code'])
             raise forms.ValidationError("A Contest with same contest code already exists.")
         except:
+            if len(self.cleaned_data['contest_code']) < 4:
+                raise forms.ValidationError("Contest Code must be at least 4 letters long.")
             return self.cleaned_data['contest_code']
 
     def clean_start_date(self):
@@ -52,7 +54,6 @@ class Prob(forms.ModelForm):
 
     try:
         choices = tuple((tag.id, tag.name) for tag in Tag.objects.all())
-        print(choices)
     except:
         choices = []
     text = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
@@ -67,6 +68,8 @@ class Prob(forms.ModelForm):
             problem = Problem.objects.get(code=self.cleaned_data['code'])
             raise forms.ValidationError("A problem with this code already exists.")
         except:
+            if len(self.cleaned_data['code']) < 4:
+                raise forms.ValidationError("Problem Code must be at least 4 letters long.")
             return self.cleaned_data['code']
 
 class EditProb(forms.ModelForm):
