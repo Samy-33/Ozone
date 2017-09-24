@@ -1,5 +1,8 @@
 {% extends 'inout/base.html' %}
 {% load static %}
+
+{% block title %} Ranking - {{contest.name}} {% endblock %}
+
 {% block content %}
 <center>
     <script src="{% static 'contests/js/timeshow.js' %}" type='text/javascript'></script>
@@ -35,7 +38,7 @@
 					Submissions
 				</th>
 			</tr>
-		
+
 		</thead>
 		<tbody>
 		{% if con %}

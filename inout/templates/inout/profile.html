@@ -1,6 +1,8 @@
 {% extends 'inout/base.html' %}
 {% load static %}
 
+{% block title %} {{ user.username }} {% endblock %}
+
 {% block css %}
   <link href='{% static "inout/css/profile.css" %}' type='text/css' rel='stylesheet' />
 {% endblock %}

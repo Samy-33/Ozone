@@ -73,7 +73,7 @@ def authenticate_user(request):
     View for authenticating a user
     """
 
-    resp = { 'success': False, 'message': ['GET method not allowerd'] }
+    resp = { 'success': False, 'message': ['GET method not allowed'] }
 
     if request.is_ajax():
         username = request.POST.get('username', '')
@@ -101,7 +101,7 @@ def register(request):
     View for registration page
     """
 
-    resp = { 'success': False, 'message': ['GET method not allowerd'] }
+    resp = { 'success': False, 'message': ['GET method not allowed'] }
     form = RegistrationForm()
 
     if request.is_ajax():

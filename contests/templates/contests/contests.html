@@ -1,5 +1,8 @@
 {% extends 'inout/base.html' %}
 {% load static %}
+
+{% block title %} Compete {% endblock %}
+
 {% block content %}
 
 <span style='float:right;'><a href='create/'><button>Create Contest</button></a></span>
@@ -16,7 +19,7 @@
 				{% for contest in current %}
                     <div class="cont">
                         <div class='c-innercont'>
-					   
+
 							<span>
                                 <h2><a href='q/{{ contest.contest_code }}/'>
 								{{contest.name}}</a>
@@ -42,7 +45,7 @@
 				{% for contest in upcoming %}
                     <div class="cont">
                          <div class="u-innercont">
-					   
+
 						  <span>
 							<h2><a href="q/{{ contest.contest_code }}/">
 								{{contest.name}} </a></h2></span><span class='code'> {{contest.contest_code}} </span>

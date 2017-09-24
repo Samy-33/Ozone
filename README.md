@@ -11,11 +11,12 @@ And additional requirements are in *requirements.txt*
   * install virtualenv `$ sudo apt install python-virtualenv`  
   * create a virtual environment `$ virtualenv env -p python3.6`  
   * activate the `env`: `$ source env/bin/activate`  
-  * Create a folder tmp/problems/ in root directory of the project.   
+  * Create a folder tmp/problems/ in root directory of the project.  
   * `$ python manage.py makemigrations inout`  
   * `$ python manage.py makemigrations contests`  
   * `$ python manage.py makemigrations practice`  
   * `$ python manage.py migrate`  
+  * Edit a variable in settings.py `CODEDIR`, change it to the absolute path of the Ozone  
   * `$ python manage.py createsuperuser`  
   * Login using the credentials of superuser  
 

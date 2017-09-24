@@ -48,9 +48,14 @@ class RegistrationForm(forms.Form):
     def clean_username(self):
         try:
             user = User.objects.get(username__iexact=self.cleaned_data['username'])
+            raise forms.ValidationError(_("Username already exists. You can't register with same username."))
         except User.DoesNotExist:
-            return self.cleaned_data['username']
-        raise forms.ValidationError(_("Username already exists. You can't register with same username."))
+            pass
+
+        if not self.cleaned_data['username'].isalnum():
+            raise forms.ValidationError(_("Username must be alphanumeric."))
+
+        return self.cleaned_data['username']
 
     def clean(self):
         if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
@@ -66,7 +71,7 @@ class ActivateForm(forms.Form):
         required=False
     )
 
-	
+
 class CodeForm(forms.Form):
     LANGUAGES = (
         ('cpp', 'C++'),

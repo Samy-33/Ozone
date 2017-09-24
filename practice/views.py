@@ -20,4 +20,4 @@ def get_tag(request, code):
     problems = filter(lambda t: now > t.problem.contest.end_date,
                       ProblemTag.objects.filter(tag=tag))
 
-    return render(request, 'practice/problems.html', {'problems':problems})
+    return render(request, 'practice/problems.html', {'problems':problems, 'tag': tag.name})

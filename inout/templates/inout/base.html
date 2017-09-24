@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title> Welcome to Ozone Judge </title>
+    <title> {% block title %} {% endblock %} : Ozone</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="{% static 'inout/js/jquery-3.2.1.js' %}" type="text/javascript"> </script>
@@ -65,9 +65,11 @@
             <a href='/domjudge/crypto'> <b>CryptoCracker</b> </a>
           </div>
           Developed for <b>IIITDMJ<b>
-          <div vlink='white' style='float: right;'>
-            <a href='{% url "inout:feedback" %}'> <b>Contact Us</b> </a>
-          </div>
+          {% if request.user.is_authenticated %}
+            <div vlink='white' style='float: right;'>
+              <a href='{% url "inout:feedback" %}'> <b>Contact Us</b> </a>
+            </div>
+          {% endif %}
         <center>
         <br>
       </div>
