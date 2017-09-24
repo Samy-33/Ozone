@@ -8,14 +8,20 @@ And additional requirements are in *requirements.txt*
 
 ## How to run it?  
 
+  * install virtualenv `$ sudo apt install python-virtualenv`  
+  * create a virtual environment `$ virtualenv env -p python3.6`  
+  * activate the `env`: `$ source env/bin/activate`  
   * Create a folder tmp/problems/ in root directory of the project.   
-  * `$ python manage.py migrate --run-syncdb`  
+  * `$ python manage.py makemigrations inout`  
+  * `$ python manage.py makemigrations contests`  
+  * `$ python manage.py makemigrations practice`  
+  * `$ python manage.py migrate`  
   * `$ python manage.py createsuperuser`  
   * Login using the credentials of superuser  
 
 Or you can just register and to activate your account,  
 I have left a print statement, so it prints out activation code in terminal when a user registers. So find it there.  
-  
+
 ## Work to be done  
 - [X] Create Contests, Add Problems.  
 - [X] Submit Code and get the verdict  
