@@ -54,3 +54,8 @@ class solved(models.Model):
     time_taken=models.DecimalField(null=False, blank=False, max_digits=5, decimal_places=2)
     #Add memory limit too
     #	memory_used=models.DecimalField(null=False, blank=False, max_digits=10, decimal_places=2)
+
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    message = models.CharField(max_length=500, blank=False)
+    reviewed = models.BooleanField(default=False)

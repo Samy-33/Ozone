@@ -15,7 +15,7 @@ from .forms import (CreateContest, Prob, EditProb)
 from inout.global_func import aware
 from inout.views import is_activated
 from time import sleep
-import datetime
+from django.utils import timezone
 import pytz
 import subprocess as sb
 
@@ -29,16 +29,16 @@ def index(request):
     : Shows all the present, past, ccurrent and user's contests
     """
 
-    upcoming = Contest.objects.filter(Q(start_date__gt=datetime.datetime.now())
+    upcoming = Contest.objects.filter(Q(start_date__gt=timezone.now())
                                       &Q(allowed=1)).order_by('-start_date')
 
-    current = Contest.objects.filter(Q(start_date__lte=datetime.datetime.now())
-                                     &Q(end_date__gt=datetime.datetime.now())
+    current = Contest.objects.filter(Q(start_date__lte=timezone.now())
+                                     &Q(end_date__gt=timezone.now())
                                      &Q(allowed=1)).order_by('-start_date')
 
     usrs_contest = Contest.objects.filter(Q(admin=request.user))
 
-    past_contests = Contest.objects.filter(Q(end_date__lt=aware(datetime.datetime.now())))
+    past_contests = Contest.objects.filter(Q(end_date__lt=timezone.now()))
 
     return render(request, 'contests/contests.html', {'upcoming':upcoming, 'current':current,
                                                       'usrs_contest':usrs_contest,
@@ -90,7 +90,7 @@ def contest(request, contest):
     """
     con = get_object_or_404(Contest, Q(contest_code=contest))
 
-    dt = aware(datetime.datetime.now())-con.start_date
+    dt = timezone.now()-con.start_date
     if dt.days < 0 or dt.seconds < 0:
         pp = True
     else:
@@ -108,9 +108,9 @@ def editc(request, contest):
                   is ongoing or upcoming
     """
     contest = get_object_or_404(Contest, Q(contest_code=contest)
-                            &Q(end_date__gte=datetime.datetime.now()))
+                            &Q(end_date__gte=timezone.now()))
     if contest.admin == request.user:
-        if contest.end_date >= aware(datetime.datetime.now()):
+        if contest.end_date >= timezone.now():
             allow_edit = True
         else:
             allow_edit = False
@@ -243,7 +243,7 @@ def problem(request, contest, question):
     # ques: The problem
     """
     contest = get_object_or_404(Contest, contest_code=contest)
-    if contest.start_date > aware(datetime.datetime.now()) and request.user != contest.admin:
+    if contest.start_date > timezone.now() and request.user != contest.admin:
         return redirect('contests:contest', contest=contest.contest_code)
     problem = get_object_or_404(Problem, code=question)
     return render(request, 'contests/problem.html', {'contest':contest, 'ques':problem})
@@ -255,7 +255,7 @@ def problem(request, contest, question):
 
 def should_update_solved(request, problem):
     already_solved = already(request.user, problem)
-    contest_started = problem.contest.start_date <= aware(datetime.datetime.now())
+    contest_started = problem.contest.start_date <= timezone.now()
     user_not_admin = problem.contest.admin != request.user
 
     return not already_solved and contest_started and user_not_admin
@@ -515,7 +515,7 @@ def addAC(request, q):
         p = Ranking.objects.create(user=request.user, contest=q.contest)
         p.ac = 1
         p.score = q.score
-    p.last_sub = datetime.datetime.now()
+    p.last_sub = timezone.now()
     p.save()
 
 def addWA(request, q):
@@ -568,7 +568,7 @@ def rankings(request, contest):
     # data: THe sorted ranking according to effective scores of users
     """
     con = get_object_or_404(Contest, contest_code=contest)
-    if(con.start_date <= aware(datetime.datetime.now())):
+    if(con.start_date <= timezone.now()):
         data = sorted(Ranking.objects.filter(Q(contest=con)), key=lambda t:(-t.effective_score, t.penalty))
         return render(request, 'contests/ranking.html', {'con':data, 'contest':con})
     else:
@@ -586,7 +586,7 @@ def deletec(request, contest):
     """
     con = get_object_or_404(Contest, contest_code=contest)
 
-    if con.start_date >= aware(datetime.datetime.now()):
+    if con.start_date >= timezone.now():
         request.user.profile.tobecon = False
         request.user.profile.save()
         import os, shutil

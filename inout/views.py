@@ -396,4 +396,22 @@ def code_edit(request):
 
 @is_activated
 def feedback(request):
-    pass
+    if request.method == 'POST':
+        message = request.POST.get('message', '').strip()
+        if len(message) == 0:
+            response = render(request, 'inout/feedback.html',
+                                        {'error': 'Feedback must not be empty.',
+                                         'success': False})
+        else:
+            from inout.models import Feedback
+            Feedback.objects.create(
+                user = request.user,
+                message = message,
+            )
+            response = render(request, 'inout/feedback.html',
+                                        {'success':True})
+    else:
+        response = render(request, 'inout/feedback.html', {'success': False,
+                                                           'error': False})
+
+    return response

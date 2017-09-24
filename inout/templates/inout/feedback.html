@@ -1,0 +1,31 @@
+{% extends 'inout/base.html' %}
+{% block content %}
+<br>
+<center>
+    <div class='container'>
+        <div class='page-header h3'>
+            We'd love to hear from you...
+        </div>
+        {% if success %}
+            <div class='alert alert-success'>
+                Success! Thank you for your input. We'll review it soon.
+            </div>
+        {% else %}
+            <form role='form' method='post' action='.'>
+                {% csrf_token %}
+                {% if error %}
+                    <div class='alert alert-danger'>
+                        {{ error }}
+                    </div>
+                {% endif %}
+                <div class='form-group'>
+                    <label for='message'> Feedback: </label>
+                    <textarea id='message' name='message' class='form-control' rows='10'> </textarea>
+                </div>
+                <button class='btn btn-primary' type='submit'> Submit </button>
+            </form>
+        {% endif %}
+    </div>
+</center>
+
+{% endblock %}
