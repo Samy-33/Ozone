@@ -52,11 +52,13 @@
                         </span></h3>
                     </div>
 				</center>
-				<span style="float:right;">
-					<a href="{% url 'contests:boardC' contest=contest.contest_code %}">
-						Discussion
-					</a>
-				</span>
+				{% if discuss %}
+					<span style="float:right;">
+						<a href="{% url 'contests:boardC' contest=contest.contest_code %}">
+							Discussion
+						</a>
+					</span>
+				{% endif %}
 				{% if pp and request.user != contest.admin %}
 					Contest is still to start
 				{% else %}

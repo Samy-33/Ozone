@@ -90,12 +90,17 @@ def contest(request, contest):
     """
     con = get_object_or_404(Contest, Q(contest_code=contest))
 
-    dt = timezone.now()-con.start_date
-    if dt.days < 0 or dt.seconds < 0:
+    # dt = timezone.now()-con.start_date
+    pp = False
+    if con.end_date >= timezone.now():
         pp = True
-    else:
-        pp = False
-    return render(request, 'contests/contest.html', {'contest':con, 'pp':pp})
+
+    discuss = True
+
+    if not con.allowed or con.start_date > timezone.now():
+        discuss = False
+
+    return render(request, 'contests/contest.html', {'contest':con, 'pp':pp, 'discuss':discuss})
 
 
 @is_activated
@@ -243,6 +248,11 @@ def problem(request, contest, question):
     # ques: The problem
     """
     contest = get_object_or_404(Contest, contest_code=contest)
+
+    discuss = True
+    if not contest.allowed or contest.start_date > timezone.now():
+        discuss = False
+
     if contest.start_date > timezone.now() and request.user != contest.admin:
         return redirect('contests:contest', contest=contest.contest_code)
     problem = get_object_or_404(Problem, code=question)
@@ -616,6 +626,8 @@ def boardC(request, contest):
     # comments: paginated comments
     """
     con = get_object_or_404(Contest, contest_code=contest)
+    if not con.allowed or con.start_date > timezone.now():
+        raise Http404
     if request.method == 'POST':
         CommentC.objects.create(
             contest=con,
@@ -642,6 +654,9 @@ def boardQ(request, question):
     # comments: paginated comments
     """
     prob = get_object_or_404(Problem, code=question)
+    con = prob.contest
+    if not con.allowed or con.start_date > timezone.now():
+        raise Http404
     if request.method=='POST':
         CommentQ.objects.create(
             problem=prob,
@@ -669,6 +684,7 @@ def convQ(request, question, pk):
     """
     main_comment = get_object_or_404(CommentQ, id=pk)
     prob = get_object_or_404(Problem, code=question)
+
     conversation_list = ConvQ.objects.filter(Q(comment=main_comment)).order_by('timestamp')
     if request.method=='POST':
         ConvQ.objects.create(
@@ -696,6 +712,7 @@ def convC(request, contest, pk):
     """
     main_comment = get_object_or_404(CommentC, id=pk)
     con = get_object_or_404(Contest, contest_code=contest)
+
     conversation_list = ConvC.objects.filter(Q(comment=main_comment)).order_by('timestamp')
     if request.method=='POST':
         ConvC.objects.create(
