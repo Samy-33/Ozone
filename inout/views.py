@@ -113,6 +113,7 @@ def register(request):
                 password = form.cleaned_data['password1'],
                 first_name = form.cleaned_data['fname'],
                 last_name = form.cleaned_data['lname'],
+                email = form.cleaned_data['email'],
             )
 
             code = ''.join([chr(random.randrange(48, 122)) for i in range(6)])
@@ -354,7 +355,7 @@ def code_edit(request):
 
         if 'python' in lang:
             run_cmd = 'timeout 5s {}'.format(cmd[lang][1]%(code_path, input_file))
-            print(cmd[lang])
+            # print(cmd[lang])
             try:
                 ps = check_output(run_cmd, shell=True, stderr=STDOUT).decode('utf-8')
                 return HttpResponse(ps)

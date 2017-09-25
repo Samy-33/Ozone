@@ -41,8 +41,6 @@ class CreateContest(forms.Form):
     def clean(self):
         super(CreateContest, self).clean()
         now = timezone.now()
-        print(now)
-        print(self.cleaned_data['start_date'])
         if now >= self.cleaned_data['start_date']:
             raise forms.ValidationError("Past dates are not allowed.")
 

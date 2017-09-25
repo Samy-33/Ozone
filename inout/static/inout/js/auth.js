@@ -2,6 +2,7 @@
 
 $(document).ready(function() {
   $('.navigation-bar').css('display', 'none');
+  $('#rdob').datepicker();
 });
 
 $(document).on('click', '#registerBtn', function(e) {
@@ -45,11 +46,11 @@ removeRedBorder = function() {
 
 getErrorHtml = function(message) {
     var errorList = '<ul>';
-    
+
     for (var i=0; i < message.length; i++) {
         errorList += '<li>' + message[i] + '</li>';
     }
-    
+
     errorList += '</ul>';
     return errorList;
 }
@@ -121,6 +122,7 @@ $(document).on('click', '#submitRegister', function(e) {
     e.preventDefault();
 
     var $username = $('#rusername'),
+        $email = $('#email'),
         $fname = $('#rfname'),
         $lname = $('#rlname'),
         $dob = $('#rdob'),
@@ -129,6 +131,7 @@ $(document).on('click', '#submitRegister', function(e) {
 
     var data = {
         username: $username.val(),
+        email: $email.val(),
         fname: $fname.val(),
         lname: $lname.val(),
         dob: $dob.val(),
@@ -137,7 +140,7 @@ $(document).on('click', '#submitRegister', function(e) {
         csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]')[0].value
     }
 
-    validateRequiredFields($username, $fname, $lname, $password1, $password2);
+    validateRequiredFields($username, $email, $fname, $lname, $password1, $password2);
 
     $.ajax({
         url: '/register/',

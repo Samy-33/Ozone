@@ -16,6 +16,8 @@ class RegistrationForm(forms.Form):
         label=_('Username'),
         error_messages={'invalid': ("This is not a valid username [Only letters and digits allowed]")}
     )
+    email = forms.EmailField(widget=forms.TextInput(attrs={'required': True, 'class': 'form-control', 'id': 'email'}),
+                             label = _('Email'))
     fname = forms.CharField(
         widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
                                       'id': 'rfname','placeholder': 'First Name'}),
@@ -48,14 +50,21 @@ class RegistrationForm(forms.Form):
     def clean_username(self):
         try:
             user = User.objects.get(username__iexact=self.cleaned_data['username'])
-            raise forms.ValidationError(_("Username already exists. You can't register with same username."))
         except User.DoesNotExist:
-            pass
+            if not self.cleaned_data['username'].isalnum():
+                raise forms.ValidationError(_("Username must be alphanumeric."))
 
-        if not self.cleaned_data['username'].isalnum():
-            raise forms.ValidationError(_("Username must be alphanumeric."))
+            return self.cleaned_data['username']
 
-        return self.cleaned_data['username']
+        raise forms.ValidationError(_("Username already exists. You can't register with same username."))
+
+    def clean_email(self):
+        try:
+            u = User.objects.get(email=self.cleaned_data['email'])
+        except Exception as e:
+            return self.cleaned_data['email']
+
+        raise forms.ValidationError(_("User with this email already exists."))
 
     def clean(self):
         if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:

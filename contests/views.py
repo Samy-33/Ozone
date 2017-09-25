@@ -147,13 +147,13 @@ def create_tag_problems(form, problem):
     for tag_id in tags:
         try:
             tag = Tag.objects.get(id=tag_id)
-            print(tag)
             ProblemTag.objects.create(
                 tag = tag,
                 problem = problem,
             )
         except Exception as e:
-            print(e.decode('utf-8'))
+            pass
+            # print(e.decode('utf-8'))
 
 @is_activated
 def addq(request, contest):
