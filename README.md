@@ -1,6 +1,9 @@
 # Ozone  
 Ozone is the OnlineJudge for **PDPM Indian Institute of Information Technology, Design and Manufacturing, Jabalpur** being developed in python3.6 and using django webframework version 1.11.3  
 
+[![Build Status](https://api.travis-ci.org/Samy-33/Ozone.svg?branch=master)](https://travis-ci.org/Samy-33/Ozone)
+
+
 ## Requirements  
 Python 3.6+  
 Django==1.11.3+  
