@@ -8,5 +8,5 @@ install:
   - pip install -U setuptools
   - pip install -r requirements.txt
 script:
-  - flake8 . --exclude tmp,tests.py,migrations--max-line-length=100
+  - flake8 . --exclude tmp,tests.py,migrations --max-line-length=100
   - isort
