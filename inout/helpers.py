@@ -1,4 +1,5 @@
-from django.middleware.csrf import _get_new_csrf_token    
+from django.middleware.csrf import _get_new_csrf_token
+
 
 def issue_new_csrf_token(request):
     """

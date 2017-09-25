@@ -1,3 +1,5 @@
 Django==1.11.3
 PySocks==1.6.7
 django-debug-toolbar==1.8
+flake8
+isort

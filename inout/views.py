@@ -1,28 +1,25 @@
-import os
 import json
+import os
 import random
-import socks
-import time
-from subprocess import *
+from subprocess import STDOUT, CalledProcessError, check_output
 
-from django import forms
-from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.mail import send_mail
-from django.core import serializers
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
+# from django.core.mail import send_mail
+# from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.template import loader
 
-from contests.models import Contest, Problem, Solve, CommentC, CommentQ, Ranking
-from .global_vars import *
-from .models import Profile
+from contests.models import CommentC, CommentQ, Contest, Ranking, Solve
+
 from .decorators import is_activated
-from .forms import RegistrationForm, ActivateForm, CodeForm
+from .forms import ActivateForm, CodeForm, RegistrationForm
+from .global_vars import cmd, extensions
 from .helpers import issue_new_csrf_token
 
 INVALID_ACTIVATION_CODE = 'Invalid Code, contact admin if you didn\'t get the code.'
@@ -34,7 +31,7 @@ def clogin(request):
     View for authentication page
     """
 
-    hide_section_states = { 'login': True, 'register': True, 'activate': True }
+    hide_section_states = {'login': True, 'register': True, 'activate': True}
     show_section = request.GET.get('showSection', '')
 
     if show_section and show_section in hide_section_states.keys():
@@ -51,7 +48,6 @@ def clogin(request):
             hide_section_states['login'], hide_section_states['register'] = True, True
     elif show_section == 'activate':
         hide_section_states['activate'], hide_section_states['login'] = True, False
-
 
     register_form = RegistrationForm()
     activate_form = ActivateForm(initial={})
@@ -73,7 +69,7 @@ def authenticate_user(request):
     View for authenticating a user
     """
 
-    resp = { 'success': False, 'message': ['GET method not allowed'] }
+    resp = {'success': False, 'message': ['GET method not allowed']}
 
     if request.is_ajax():
         username = request.POST.get('username', '')
@@ -88,9 +84,9 @@ def authenticate_user(request):
             if not is_activated:
                 request = issue_new_csrf_token(request)
 
-            resp = { 'success': True, 'is_activated': is_activated }
+            resp = {'success': True, 'is_activated': is_activated}
         else:
-            resp = { 'success': False, 'message': ['Enter a valid username/password.'] }
+            resp = {'success': False, 'message': ['Enter a valid username/password.']}
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
@@ -101,7 +97,7 @@ def register(request):
     View for registration page
     """
 
-    resp = { 'success': False, 'message': ['GET method not allowed'] }
+    resp = {'success': False, 'message': ['GET method not allowed']}
     form = RegistrationForm()
 
     if request.is_ajax():
@@ -109,11 +105,11 @@ def register(request):
 
         if form.is_valid():
             user = User.objects.create_user(
-                username = form.cleaned_data['username'],
-                password = form.cleaned_data['password1'],
-                first_name = form.cleaned_data['fname'],
-                last_name = form.cleaned_data['lname'],
-                email = form.cleaned_data['email'],
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'],
+                first_name=form.cleaned_data['fname'],
+                last_name=form.cleaned_data['lname'],
+                email=form.cleaned_data['email'],
             )
 
             code = ''.join([chr(random.randrange(48, 122)) for i in range(6)])
@@ -138,7 +134,7 @@ def register(request):
             Email the user
             """
 
-            resp = { 'success': True }
+            resp = {'success': True}
         else:
             error_json = json.loads(form.errors.as_json())
             codes = [error_json[error][0]['code'] for error in error_json]
@@ -147,7 +143,7 @@ def register(request):
             if 'required' in codes:
                 messages = ['Required fields are absent.']
 
-            resp = { 'success': False, 'message': messages }
+            resp = {'success': False, 'message': messages}
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
@@ -192,7 +188,8 @@ def index(request):
     convc = CommentC.objects.all().order_by('-timestamp')[:10]
     convq = CommentQ.objects.all().order_by('-timestamp')[:10]
 
-    return render(request, 'inout/home.html', {'convc':convc, 'convq':convq})
+    return render(request, 'inout/home.html', {'convc': convc, 'convq': convq})
+
 
 @is_activated
 def give_contests(request):
@@ -203,10 +200,10 @@ def give_contests(request):
     if request.is_ajax() and (request.user.is_staff or request.user.is_superuser):
         contests = Contest.objects.filter(allowed=0)
         contest_request_template = loader.get_template('inout/contest_requests.html')
-        contest_requests_html = contest_request_template.render({ 'contests': contests })
-        resp = { 'contest_requests_html': contest_requests_html }
+        contest_requests_html = contest_request_template.render({'contests': contests})
+        resp = {'contest_requests_html': contest_requests_html}
     else:
-        resp = { 'success': False, 'message': 'Only XMLHttp request allowed by staff/superusers' }
+        resp = {'success': False, 'message': 'Only XMLHttp request allowed by staff/superusers'}
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
@@ -224,7 +221,7 @@ def allow(request):
         contest_code = request.POST.get('contest_code', None)
 
         if is_allowed not in [1, 0] or contest_code is None:
-            resp = { 'success': False, 'message': 'Invalid post parameters' }
+            resp = {'success': False, 'message': 'Invalid post parameters'}
 
         else:
             contest = Contest.objects.get(contest_code=contest_code)
@@ -239,9 +236,9 @@ def allow(request):
                 user.save()
                 contest.delete()
 
-            resp = { 'success': True }
+            resp = {'success': True}
     else:
-        resp = { 'success': False, 'message': 'Only XMLHttp request allowed by staff/superusers' }
+        resp = {'success': False, 'message': 'Only XMLHttp request allowed by staff/superusers'}
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
@@ -259,7 +256,7 @@ def profile(request, username):
     page = request.GET.get('page', 1)
     solved_problems = paginator.page(page)
 
-    return render(request, 'inout/profile.html', { 'user': user, 'solved_problems': solved_problems })
+    return render(request, 'inout/profile.html', {'user': user, 'solved_problems': solved_problems})
 
 
 def is_alright(string, lang):
@@ -282,12 +279,15 @@ def is_alright(string, lang):
         return False
     return True
 
+
 """
 This area is to calculate new rating after the contest
 """
 
+
 def expect(user_rating, opp_rating):
     return 1/(1+10**((opp_rating-user_rating)*400))
+
 
 def calculate_rating(old_rating, expected_rating, actual_rating, k_factor):
     return old_rating + k_factor*(actual_rating-expected_rating)
@@ -297,9 +297,9 @@ def calculate_rating(old_rating, expected_rating, actual_rating, k_factor):
 def update(request, contest):
     contest = get_object_or_404(Contest, contest_code=contest)
     if contest.updated or not contest.rated:
-        return JsonResponse({'status':'IC', 'error':'invalid contest'}, status=200)
+        return JsonResponse({'status': 'IC', 'error': 'invalid contest'}, status=200)
     users = Ranking.objects.filter(contest=contest)
-    users = sorted(users, key=lambda t:(-t.effective_score, t.penalty))
+    users = sorted(users, key=lambda t: (-t.effective_score, t.penalty))
     expected = {}
     actual = {}
     new_rating = {}
@@ -326,7 +326,8 @@ def update(request, contest):
     contest.admin.save()
     contest.updated = True
     contest.save()
-    return JsonResponse({'status':'SC', 'error':'No Error'}, status=200)
+    return JsonResponse({'status': 'SC', 'error': 'No Error'}, status=200)
+
 
 @is_activated
 def code_edit(request):
@@ -354,25 +355,27 @@ def code_edit(request):
             file.write(request.POST.get('inpt'))
 
         if 'python' in lang:
-            run_cmd = 'timeout 5s {}'.format(cmd[lang][1]%(code_path, input_file))
+            run_cmd = 'timeout 5s {}'.format(cmd[lang][1] % (code_path, input_file))
             # print(cmd[lang])
             try:
                 ps = check_output(run_cmd, shell=True, stderr=STDOUT).decode('utf-8')
                 return HttpResponse(ps)
             except CalledProcessError as e:
-                if("status 124" not in str(e)):
-                    retdata = "<pre>{}</pre>".format("<br>".join(e.output.decode('utf-8').split("\n")))
+                if "status 124" not in str(e):
+                    retdata = "<pre>{}</pre>".format("<br>"
+                                                     .join(e.output.decode('utf-8').split("\n")))
                     return HttpResponse(retdata)
-                elif("status 1" in str(e)):
+                elif "status 1" in str(e):
                     return HttpResponse("Time Exceeded: 5.0s")
                 else:
                     return HttpResponse("Server Error")
         else:
-            outpt = "a.out" if lang != "java" else '';
-            output_path = os.path.join(os.getcwd(), 'tmp/{}/{}'.format(request.user.username, outpt))
+            outpt = "a.out" if lang != "java" else ''
+            output_path = os.path.join(os.getcwd(), 'tmp/{}/{}'.format(request.user.username,
+                                                                       outpt))
 
-            if lang !='java':
-                compile_cmd = cmd[lang][0]%(code_path, output_path)
+            if lang != 'java':
+                compile_cmd = cmd[lang][0] % (code_path, output_path)
             else:
                 compile_cmd = f'javac {CODEDIR}/tmp/{request.user.username}/code.java'
 
@@ -380,10 +383,13 @@ def code_edit(request):
                 ps = check_output(compile_cmd, shell=True, stderr=STDOUT).decode('utf-8')
 
                 if lang != 'java':
-                    run_cmd = "timeout 5s "+((cmd[lang][1]%(output_path, input_file)))
+                    run_cmd = "timeout 5s "+((cmd[lang][1] % (output_path, input_file)))
 
                 else:
-                    run_cmd = "java -cp %s < %s"%(os.path.join(CODEDIR,"tmp/%s Main"%request.user.username), input_file)
+                    relative_path = "tmp/{} Main".format(request.user.username)
+                    run_cmd = "java -cp %s < %s" % (os.path.join(CODEDIR,
+                                                                 relative_path,
+                                                                 input_file))
 
                 ps = check_output(run_cmd, shell=True, stderr=STDOUT).decode('utf-8')
                 return HttpResponse(ps)
@@ -392,7 +398,8 @@ def code_edit(request):
                 retdata = "<pre>{}</pre>".format("<br>".join(e.output.decode('utf-8').split("\n")))
                 return HttpResponse(retdata)
 
-    else: return render(request, 'inout/code-edit.html', {'form':form})
+    else:
+        return render(request, 'inout/code-edit.html', {'form': form})
 
 
 @is_activated
@@ -401,16 +408,16 @@ def feedback(request):
         message = request.POST.get('message', '').strip()
         if len(message) == 0:
             response = render(request, 'inout/feedback.html',
-                                        {'error': 'Feedback must not be empty.',
-                                         'success': False})
+                              {'error': 'Feedback must not be empty.',
+                               'success': False})
         else:
             from inout.models import Feedback
             Feedback.objects.create(
-                user = request.user,
-                message = message,
+                user=request.user,
+                message=message,
             )
             response = render(request, 'inout/feedback.html',
-                                        {'success':True})
+                              {'success': True})
     else:
         response = render(request, 'inout/feedback.html', {'success': False,
                                                            'error': False})

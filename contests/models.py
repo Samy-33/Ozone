@@ -1,14 +1,13 @@
-from datetime import datetime as dt
-from django.db import models
 from django.contrib.auth.models import User
-from django.dispatch import receiver
-import time
+from django.db import models
+from django.utils import timezone
 
 
 class Contest(models.Model):
     admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=30, blank=False, null=False)
-    contest_code = models.CharField(max_length=10, primary_key=True, unique=True, blank=False)
+    contest_code = models.CharField(max_length=10, primary_key=True,
+                                    unique=True, blank=False)
     start_date = models.DateTimeField(null=False, blank=False)
     end_date = models.DateTimeField(null=False, blank=False)
     allowed = models.IntegerField(default=0, blank=False, null=False)
@@ -28,15 +27,17 @@ class Problem(models.Model):
     text = models.CharField(max_length=10000, blank=False, null=False)
     n_testfiles = models.IntegerField(default=0, blank=False, null=False)
     time_lim = models.FloatField(default=1.0, blank=False, null=False)
-    score = models.IntegerField(default = 0)
+    score = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.name}'
 
+
 class Solve(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
-    time = models.DateTimeField(auto_now = True)
+    time = models.DateTimeField(auto_now=True)
+
 
 class Ranking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -52,32 +53,36 @@ class Ranking(models.Model):
 
     @property
     def penalty(self):
-    #		current_time = time.time()
-        start_time = dt.timestamp(self.contest.start_date)
+        # current_time = time.time()
+        start_time = timezone.timestamp(self.contest.start_date)
         if not self.last_sub:
             return 0
 
-        penalty = dt.timestamp(self.last_sub) - start_time + self.wa * 600
+        penalty = timezone.timestamp(self.last_sub) - start_time + self.wa * 600
         return int(penalty)
-		
+
+
 class CommentC(models.Model):
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=20, default='')
     timestamp = models.DateTimeField(auto_now=True)
-	
+
+
 class CommentQ(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=20, default='')
     timestamp = models.DateTimeField(auto_now=True)
 
+
 class ConvC(models.Model):
     comment = models.ForeignKey(CommentC, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=500, default='')
     timestamp = models.DateTimeField(auto_now=True)
-	
+
+
 class ConvQ(models.Model):
     comment = models.ForeignKey(CommentQ, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

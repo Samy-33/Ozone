@@ -58,7 +58,7 @@ ROOT_URLCONF = 'ozone.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/','templates'],
+        'DIRS': ['/', 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,7 +120,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),]
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 LOGIN_REDIRECT_URL = '/home/'
@@ -128,9 +128,9 @@ LOGIN_URL = '/login'
 APPEND_SLASH = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER='saket.patel@iiitdmj.ac.in'
-EMAIL_HOST_PASSWORD='xxxxxxxx'
-#EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'saket.patel@iiitdmj.ac.in'
+EMAIL_HOST_PASSWORD = 'xxxxxxxx'
+# EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
 CODEDIR = '/home/saket/Documents/django-tut/Ozone'
 

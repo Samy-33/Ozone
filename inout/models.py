@@ -1,7 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 from contests.models import Problem
 
 
@@ -39,21 +40,24 @@ def create_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
         import os
         from ozone.settings import CODEDIR
-        path = os.path.join(CODEDIR, "tmp/%s"%instance.username)
-        if(not os.path.exists(path)):
+        path = os.path.join(CODEDIR, "tmp/{}".format(instance.username))
+        if not os.path.exists(path):
             os.mkdir(path)
+
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
     instance.profile.save()
 
+
 class solved(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     problem = models.OneToOneField(Problem, on_delete=models.CASCADE)
     tm = models.DateTimeField(auto_now_add=True, blank=False)
-    time_taken=models.DecimalField(null=False, blank=False, max_digits=5, decimal_places=2)
-    #Add memory limit too
-    #	memory_used=models.DecimalField(null=False, blank=False, max_digits=10, decimal_places=2)
+    time_taken = models.DecimalField(null=False, blank=False, max_digits=5, decimal_places=2)
+    # Add memory limit too
+    # memory_used=models.DecimalField(null=False, blank=False, max_digits=10, decimal_places=2)
+
 
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

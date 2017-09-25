@@ -1,25 +1,22 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, Http404, JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_protect
-from django.db.models import Q
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import (Contest, Problem,
-                     Solve, Ranking,
-                     CommentQ, CommentC,
-                     ConvC, ConvQ,)
-from practice.models import Tag, ProblemTag
-from inout.global_vars import (extensions, cmds, output)
-from .forms import (CreateContest, Prob, EditProb)
-from inout.global_func import aware
-from inout.views import is_activated
-from time import sleep
-from django.utils import timezone
-import pytz
+import os
+import shutil
 import subprocess as sb
 
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_protect
+
+from inout.global_vars import extensions, output
+from inout.views import is_activated
 from ozone.settings import CODEDIR
+from practice.models import ProblemTag, Tag
+
+from .forms import CreateContest, EditProb, Prob
+from .models import (CommentC, CommentQ, Contest, ConvC, ConvQ, Problem,
+                     Ranking, Solve)
 
 
 @is_activated
@@ -30,19 +27,19 @@ def index(request):
     """
 
     upcoming = Contest.objects.filter(Q(start_date__gt=timezone.now())
-                                      &Q(allowed=1)).order_by('-start_date')
+                                      & Q(allowed=1)).order_by('-start_date')
 
     current = Contest.objects.filter(Q(start_date__lte=timezone.now())
-                                     &Q(end_date__gt=timezone.now())
-                                     &Q(allowed=1)).order_by('-start_date')
+                                     & Q(end_date__gt=timezone.now())
+                                     & Q(allowed=1)).order_by('-start_date')
 
     usrs_contest = Contest.objects.filter(Q(admin=request.user))
 
     past_contests = Contest.objects.filter(Q(end_date__lt=timezone.now()))
 
-    return render(request, 'contests/contests.html', {'upcoming':upcoming, 'current':current,
-                                                      'usrs_contest':usrs_contest,
-                                                      'past_contests':past_contests})
+    return render(request, 'contests/contests.html', {'upcoming': upcoming, 'current': current,
+                                                      'usrs_contest': usrs_contest,
+                                                      'past_contests': past_contests})
 
 
 @is_activated
@@ -61,8 +58,8 @@ def create(request):
         if form.is_valid():
 
             c = Contest.objects.create(
-                admin = request.user,
-                name = form.cleaned_data['name'],
+                admin=request.user,
+                name=form.cleaned_data['name'],
                 contest_code=form.cleaned_data['contest_code'],
                 start_date=form.cleaned_data['start_date'],
                 end_date=form.cleaned_data['end_date'],
@@ -73,10 +70,10 @@ def create(request):
 
             return redirect('contests:contest', contest=c.contest_code)
         else:
-            return render(request, 'contests/create_contest.html', {'form':form, 'done':False})
+            return render(request, 'contests/create_contest.html', {'form': form, 'done': False})
     else:
         form = CreateContest(initial={})
-        return render(request, 'contests/create_contest.html', {'form':form, 'done':False})
+        return render(request, 'contests/create_contest.html', {'form': form, 'done': False})
 
 
 @is_activated
@@ -100,7 +97,7 @@ def contest(request, contest):
     if not con.allowed or con.start_date > timezone.now():
         discuss = False
 
-    return render(request, 'contests/contest.html', {'contest':con, 'pp':pp, 'discuss':discuss})
+    return render(request, 'contests/contest.html', {'contest': con, 'pp': pp, 'discuss': discuss})
 
 
 @is_activated
@@ -113,16 +110,16 @@ def editc(request, contest):
                   is ongoing or upcoming
     """
     contest = get_object_or_404(Contest, Q(contest_code=contest)
-                            &Q(end_date__gte=timezone.now()))
+                                & Q(end_date__gte=timezone.now()))
     if contest.admin == request.user:
         if contest.end_date >= timezone.now():
             allow_edit = True
         else:
             allow_edit = False
 
-        return render(request, 'contests/editc.html', {'contest':contest, 'aled':allow_edit})
+        return render(request, 'contests/editc.html', {'contest': contest, 'aled': allow_edit})
 
-    return render(request, 'contests/editc.html', {'contest':False})
+    return render(request, 'contests/editc.html', {'contest': False})
 
 
 def create_test_files(request, problem, edit_problem=False):
@@ -142,18 +139,19 @@ def create_test_files(request, problem, edit_problem=False):
             for line in request.FILES[file].readlines():
                 f.write(line.decode('utf-8'))
 
+
 def create_tag_problems(form, problem):
     tags = form.cleaned_data['tags']
     for tag_id in tags:
         try:
             tag = Tag.objects.get(id=tag_id)
             ProblemTag.objects.create(
-                tag = tag,
-                problem = problem,
+                tag=tag,
+                problem=problem,
             )
         except Exception as e:
             pass
-            # print(e.decode('utf-8'))
+
 
 @is_activated
 def addq(request, contest):
@@ -163,20 +161,20 @@ def addq(request, contest):
     # con: contest in which question is to be added
     # pb: This is the question sent as the POST data
     """
-    if(request.method=='POST'):
+    if request.method == 'POST':
         try:
             con = Contest.objects.get(contest_code=contest)
             form = Prob(request.POST)
             if form.is_valid():
                 pb = Problem.objects.create(
-                    setter = request.user,
-                    contest = con,
-                    name = form.cleaned_data['name'],
-                    code = form.cleaned_data['code'],
-                    text = form.cleaned_data['text'],
-                    time_lim = form.cleaned_data['time_lim'],
-                    score = form.cleaned_data['score'],
-                    n_testfiles = form.cleaned_data['n_testfiles'],
+                    setter=request.user,
+                    contest=con,
+                    name=form.cleaned_data['name'],
+                    code=form.cleaned_data['code'],
+                    text=form.cleaned_data['text'],
+                    time_lim=form.cleaned_data['time_lim'],
+                    score=form.cleaned_data['score'],
+                    n_testfiles=form.cleaned_data['n_testfiles'],
                 )
 
                 create_test_files(request, pb)
@@ -184,12 +182,12 @@ def addq(request, contest):
 
                 return redirect('contests:editc', contest=contest)
             else:
-                return render(request, 'contests/addq.html', {'form':form})
+                return render(request, 'contests/addq.html', {'form': form})
 
         except Exception as e:
-            return render(request, 'contests/addq.html', {'form':Prob(initial={})})
+            return render(request, 'contests/addq.html', {'form': Prob(initial={})})
 
-    return render(request, 'contests/addq.html', {'form':Prob(initial={})})
+    return render(request, 'contests/addq.html', {'form': Prob(initial={})})
 
 
 @is_activated
@@ -203,7 +201,7 @@ def editq(request, contest, question):
     contest = get_object_or_404(Contest, contest_code=contest)
     problem = get_object_or_404(Problem, code=question)
 
-    if request.method=='POST':
+    if request.method == 'POST':
         form = EditProb(request.POST)
         if form.is_valid():
 
@@ -227,16 +225,16 @@ def editq(request, contest, question):
                 'con_code': contest.contest_code,
                 'q_code': problem.code
             }
-            return render(requset, 'contests/editq.html', context)
+            return render(request, 'contests/editq.html', context)
 
     form = EditProb({'name': problem.name,
                      'n_testfiles': problem.n_testfiles,
                      'time_lim': problem.time_lim,
                      'score': problem.score,
                      'text': problem.text})
-    return render(request, 'contests/editq.html', {'form':form,
-                                                   'con_code':contest.contest_code,
-                                                   'q_code':problem.code})
+    return render(request, 'contests/editq.html', {'form': form,
+                                                   'con_code': contest.contest_code,
+                                                   'q_code': problem.code})
 
 
 @is_activated
@@ -256,12 +254,16 @@ def problem(request, contest, question):
     if contest.start_date > timezone.now() and request.user != contest.admin:
         return redirect('contests:contest', contest=contest.contest_code)
     problem = get_object_or_404(Problem, code=question)
-    return render(request, 'contests/problem.html', {'contest':contest, 'ques':problem})
+    return render(request, 'contests/problem.html', {'contest': contest,
+                                                     'ques': problem,
+                                                     'discuss': discuss})
+
 
 """
 ## This whole region is for checking the user's output agains the given test outputs
 
 """
+
 
 def should_update_solved(request, problem):
     already_solved = already(request.user, problem)
@@ -277,7 +279,9 @@ def run_code(request, problem, code_info, test_number):
     try:
         if language == 'java':
 
-            code_info['outputpath'] = os.path.join(CODEDIR, f'tmp/{request.user.username}/{problem.code}') + ' Main'
+            code_info['outputpath'] = os.path.join(CODEDIR,
+                                                   f'tmp/{request.user.username}/{problem.code}') \
+                                                   + ' Main'
 
             run_cmd = f'timeout {problem.time_lim}s time ' \
                       f'java -cp {code_info["outputpath"]} ' \
@@ -289,24 +293,25 @@ def run_code(request, problem, code_info, test_number):
                                         code_info['inp_file'],
                                         code_info['out_file']
                                        )
-        ### Not Secure
+        # Not Secure
         response = sb.check_output(run_cmd.strip(), shell=True, stderr=sb.STDOUT).decode('utf-8')
 
         retcode = check(request.user, problem.code, test_number)
-        if retcode==1:
+        if retcode == 1:
             current_time_taken = float(response.split()[2].split('e')[0].split(":")[1])
             return current_time_taken
 
-        elif retcode==0:
-            return JsonResponse({'status':'WA', 'error':f'WA in testcase {test_number+1}'})
+        elif retcode == 0:
+            return JsonResponse({'status': 'WA', 'error': f'WA in testcase {test_number+1}'})
         else:
-            return JsonResponse({'status':'SE', 'error':'Results can\'t be matched properly. Contact Admin.'})
+            return JsonResponse({'status': 'SE',
+                                 'error': 'Results can\'t be matched properly. Contact Admin.'})
 
     except sb.CalledProcessError as e:
         if 'status 124' in str(e):
-            return JsonResponse({'status':'TLE', 'error':f'TLE {problem.time_lim+0.1}'})
+            return JsonResponse({'status': 'TLE', 'error': f'TLE {problem.time_lim+0.1}'})
         if 'status 1' in str(e):
-            return JsonResponse({'status':'RTE', 'error':'Run Time Error'})
+            return JsonResponse({'status': 'RTE', 'error': 'Run Time Error'})
 
 
 def run_python(request, problem, code_info, test_number):
@@ -333,22 +338,23 @@ def run_python(request, problem, code_info, test_number):
             return current_time_taken
 
         elif retcode == 0:
-            return JsonResponse({'status':'WA', 'error':f'WA in testcase {test_number+1}'})
+            return JsonResponse({'status': 'WA', 'error': f'WA in testcase {test_number+1}'})
 
         else:
-            return JsonResponse({'status':'SE', 'error':f'Results can\'t be matched properly'})
+            return JsonResponse({'status': 'SE', 'error': f'Results can\'t be matched properly'})
 
     except sb.CalledProcessError as e:
 
         if 'status 124' not in str(e):
             output_string = e.output.decode('utf-8').split('\n')[:4]
             output_string = '<pre>{}</pre>'.format('<br>'.join(output_string))
-            return JsonResponse({'status':'CE', 'error':output_string})
+            return JsonResponse({'status': 'CE', 'error': output_string})
 
-        if should_add_solved:
+        if should_update_solved(request, problem):
             addWA(request, problem)
 
-        return JsonResponse({'status':'TLE', 'error':'Time Limit Exceeded'})
+        return JsonResponse({'status': 'TLE', 'error': 'Time Limit Exceeded'})
+
 
 def compile_code(request, problem, code_info):
     language = code_info['language']
@@ -366,15 +372,16 @@ def compile_code(request, problem, code_info):
         compile_cmd = f'javac {ddir}'
 
     try:
-        ## Not secure
+        # Not secure
         sb.check_output(compile_cmd.strip(), shell=True, stderr=sb.STDOUT).decode('utf-8')
 
     except sb.CalledProcessError as e:
         removeDir(request, problem.code)
         if 'status 124' not in str(e):
             retdata = "<pre>{}</pre>".format("<br>".join(e.output.decode('utf-8').split('\n')))
-            return JsonResponse({'status':'compile_error', 'error':retdata})
-        return JsonResponse({'status':'SE', 'error':'Unknow System Error, contact admin.'})
+            return JsonResponse({'status': 'compile_error', 'error': retdata})
+        return JsonResponse({'status': 'SE', 'error': 'Unknow System Error, contact admin.'})
+
 
 @csrf_protect
 @is_activated
@@ -403,7 +410,7 @@ def submit(request, question):
         language = request.POST.get('lang')
 
         if not is_alright(code_data, language):
-            return JsonResponse({'status':'Code execution failure', 'error':'Invalid Code.'})
+            return JsonResponse({'status': 'Code execution failure', 'error': 'Invalid Code.'})
 
         maximum_time_taken = 0.0
 
@@ -447,7 +454,7 @@ def submit(request, question):
                 'inp_file': inp_file,
                 'out_file': out_file,
             })
-            ## Separate Code for Python
+            # Separate Code for Python
             if 'python' in language:
                 execution_verdict = run_python(request, q, code_info, i)
             else:
@@ -469,25 +476,25 @@ def submit(request, question):
         if not already(request.user, q):
             addSolve(request, q)
 
-        return JsonResponse({'status':'Accepted', 'error':f'Time Taken: {maximum_time_taken}'})
+        return JsonResponse({'status': 'Accepted', 'error': f'Time Taken: {maximum_time_taken}'})
 
-    return  JsonResponse({'status':'NT', 'error':'can\'t find any testcase for this problem'})
+    return JsonResponse({'status': 'NT', 'error': 'can\'t find any testcase for this problem'})
+
 
 def removeDir(request, code):
     """
     utility function to remove temporary directory created
     """
-    import os, shutil
     path_to_clear = os.path.join(CODEDIR, f'tmp/{request.user.username}/{code}')
     if(os.path.exists(path_to_clear)):
         shutil.rmtree(path_to_clear)
+
 
 def check(user, problem, n):
     """
     Utility function to compare user's output and expected output and return the verdict
     """
     try:
-        import os
         user_output = open(os.path.join(CODEDIR, f'tmp/{user}/{problem}/uout{n}.txt'), 'r')
         exp_output = open(os.path.join(CODEDIR, f'tmp/problems/{problem}/out{n}.txt'), 'r')
         user_line, expected_line = '1', '1'
@@ -500,18 +507,21 @@ def check(user, problem, n):
     except Exception as e:
         return 2
 
-def already(user, q):
+
+def already(user, question):
     """
     Utility function to check whether user has already solved the particular problem
     or not
     """
-    return Solve.objects.filter(Q(problem=q)&Q(user=user)).exists()
+    return Solve.objects.filter(Q(problem=question) & Q(user=user)).exists()
+
 
 def addSolve(request, q):
     """
     Utility funtion to mark that user has solved the particular problem
     """
     Solve.objects.create(user=request.user, problem=q)
+
 
 def addAC(request, q):
     """
@@ -527,6 +537,7 @@ def addAC(request, q):
         p.score = q.score
     p.last_sub = timezone.now()
     p.save()
+
 
 def addWA(request, q):
     """
@@ -546,6 +557,7 @@ def addWA(request, q):
 ## Here is the end of Submission check view and related functions
 
 """
+
 
 @is_activated
 def deleteq(request, question):
@@ -579,11 +591,11 @@ def rankings(request, contest):
     """
     con = get_object_or_404(Contest, contest_code=contest)
     if(con.start_date <= timezone.now()):
-        data = sorted(Ranking.objects.filter(Q(contest=con)), key=lambda t:(-t.effective_score, t.penalty))
-        return render(request, 'contests/ranking.html', {'con':data, 'contest':con})
+        data = sorted(Ranking.objects.filter(Q(contest=con)),
+                      key=lambda t: (-t.effective_score, t.penalty))
+        return render(request, 'contests/ranking.html', {'con': data, 'contest': con})
     else:
-        return render(request, 'contests/ranking.html', {'con':None, 'contest':con})
-
+        return render(request, 'contests/ranking.html', {'con': None, 'contest': con})
 
 
 @is_activated
@@ -599,22 +611,23 @@ def deletec(request, contest):
     if con.start_date >= timezone.now():
         request.user.profile.tobecon = False
         request.user.profile.save()
-        import os, shutil
+
         for problem in con.problem_set.all():
             path_to_remove = os.path.join(CODEDIR, f'tmp/problems/{problem.code}')
             if os.path.exists(path_to_remove):
                 shutil.rmtree(path_to_remove)
         con.delete()
-        return JsonResponse({'done':'Yes, Did that.'}, status=200)
-    return JsonResponse({'done':'Nope cant do that'}, status=200)
+        return JsonResponse({'done': 'Yes, Did that.'}, status=200)
+    return JsonResponse({'done': 'Nope cant do that'}, status=200)
 
 
 @is_activated
 def get_time(request, contest):
     contest = get_object_or_404(Contest, contest_code=contest)
 
-    return JsonResponse({'start':contest.start_date,
-                         'end':contest.end_date}, status=200)
+    return JsonResponse({'start': contest.start_date,
+                         'end': contest.end_date}, status=200)
+
 
 @is_activated
 def boardC(request, contest):
@@ -632,7 +645,8 @@ def boardC(request, contest):
         CommentC.objects.create(
             contest=con,
             user=request.user,
-            text = request.POST.get('com'),)
+            text=request.POST.get('com'),
+        )
     comments_list = CommentC.objects.filter(Q(contest=con)).order_by('-timestamp')
     paginator = Paginator(comments_list, 10)
     page = request.GET.get('page')
@@ -641,7 +655,7 @@ def boardC(request, contest):
     except:
         comments = paginator.page(1)
 
-    return render(request, 'contests/discussionC.html', {'comments':comments, 'con':con})
+    return render(request, 'contests/discussionC.html', {'comments': comments, 'con': con})
 
 
 @is_activated
@@ -657,11 +671,11 @@ def boardQ(request, question):
     con = prob.contest
     if not con.allowed or con.start_date > timezone.now():
         raise Http404
-    if request.method=='POST':
+    if request.method == 'POST':
         CommentQ.objects.create(
             problem=prob,
             user=request.user,
-            text = request.POST.get('com'),
+            text=request.POST.get('com'),
         )
     comments_list = CommentQ.objects.filter(Q(problem=prob)).order_by('-timestamp')
     paginator = Paginator(comments_list, 10)
@@ -671,7 +685,7 @@ def boardQ(request, question):
     except:
         comments = paginator.page(1)
 
-    return render(request, 'contests/discussionQ.html', {'comments':comments, 'prob':prob})
+    return render(request, 'contests/discussionQ.html', {'comments': comments, 'prob': prob})
 
 
 @is_activated
@@ -686,7 +700,7 @@ def convQ(request, question, pk):
     prob = get_object_or_404(Problem, code=question)
 
     conversation_list = ConvQ.objects.filter(Q(comment=main_comment)).order_by('timestamp')
-    if request.method=='POST':
+    if request.method == 'POST':
         ConvQ.objects.create(
             comment=main_comment,
             user=request.user,
@@ -699,7 +713,9 @@ def convQ(request, question, pk):
     except:
         conversations = paginator.page(1)
 
-    return render(request, 'contests/convQ.html', {'conversations':conversations, 'prob':prob, 'main':main_comment})
+    return render(request, 'contests/convQ.html', {'conversations': conversations,
+                                                   'prob': prob,
+                                                   'main': main_comment})
 
 
 @is_activated
@@ -714,7 +730,7 @@ def convC(request, contest, pk):
     con = get_object_or_404(Contest, contest_code=contest)
 
     conversation_list = ConvC.objects.filter(Q(comment=main_comment)).order_by('timestamp')
-    if request.method=='POST':
+    if request.method == 'POST':
         ConvC.objects.create(
             comment=main_comment,
             user=request.user,
@@ -727,4 +743,6 @@ def convC(request, contest, pk):
     except:
         conversations = paginator.page(1)
 
-    return render(request, 'contests/convC.html', {'conversations':conversations, 'con':con, 'main':main_comment})
+    return render(request, 'contests/convC.html', {'conversations': conversations,
+                                                   'con': con,
+                                                   'main': main_comment})

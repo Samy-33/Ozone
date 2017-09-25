@@ -1,8 +1,9 @@
-import re
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-from .models import *
+
+# from .models import *
+
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -12,15 +13,21 @@ class RegistrationForm(forms.Form):
     username = forms.RegexField(
         regex=r'^\w+$',
         widget=forms.TextInput(attrs={'required': True, 'max_length': 20, 'class': 'form-control',
-                                      'id': 'rusername','placeholder': 'Username'}),
+                                      'id': 'rusername', 'placeholder': 'Username'}),
         label=_('Username'),
-        error_messages={'invalid': ("This is not a valid username [Only letters and digits allowed]")}
+        error_messages={
+            'invalid': ("This is not a valid username [Only letters and digits allowed]")
+        }
     )
-    email = forms.EmailField(widget=forms.TextInput(attrs={'required': True, 'class': 'form-control', 'id': 'email'}),
-                             label = _('Email'))
+    email = forms.EmailField(widget=forms.TextInput(attrs={
+                                                            'required': True,
+                                                            'class': 'form-control',
+                                                            'id': 'email'
+                                                    }),
+                             label=_('Email'))
     fname = forms.CharField(
         widget=forms.TextInput(attrs={'required': True, 'maxlength': 20, 'class': 'form-control',
-                                      'id': 'rfname','placeholder': 'First Name'}),
+                                      'id': 'rfname', 'placeholder': 'First Name'}),
         label=_("First Name")
     )
     lname = forms.CharField(
@@ -36,7 +43,8 @@ class RegistrationForm(forms.Form):
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={'required': True, 'minlength': 8, 'maxlength': 30,
                                           'render_value': True, 'class': 'form-control',
-                                          'id': 'rpassword1', 'placeholder': 'Password (8-30 characters)'}),
+                                          'id': 'rpassword1',
+                                          'placeholder': 'Password (8-30 characters)'}),
         label=_("Password")
     )
     password2 = forms.CharField(
@@ -46,21 +54,20 @@ class RegistrationForm(forms.Form):
         label=_("Repeat Password")
     )
 
-
     def clean_username(self):
         try:
-            user = User.objects.get(username__iexact=self.cleaned_data['username'])
+            User.objects.get(username__iexact=self.cleaned_data['username'])
         except User.DoesNotExist:
             if not self.cleaned_data['username'].isalnum():
                 raise forms.ValidationError(_("Username must be alphanumeric."))
 
             return self.cleaned_data['username']
 
-        raise forms.ValidationError(_("Username already exists. You can't register with same username."))
+        raise forms.ValidationError(_("Username already exists."))
 
     def clean_email(self):
         try:
-            u = User.objects.get(email=self.cleaned_data['email'])
+            User.objects.get(email=self.cleaned_data['email'])
         except Exception as e:
             return self.cleaned_data['email']
 
@@ -75,7 +82,7 @@ class RegistrationForm(forms.Form):
 
 class ActivateForm(forms.Form):
     act_code = forms.CharField(
-        widget=forms.TextInput(attrs={ 'maxlength': 6, 'class': "activate-input form-control" }),
+        widget=forms.TextInput(attrs={'maxlength': 6, 'class': "activate-input form-control"}),
         label=_("Activation Code"),
         required=False
     )
@@ -99,7 +106,8 @@ class CodeForm(forms.Form):
         label=_("Code")
     )
     inpt = forms.CharField(
-        widget=forms.Textarea(attrs={'max_length': 100, 'rows': 3, 'class': "codebox form-control"}),
+        widget=forms.Textarea(attrs={'max_length': 100, 'rows': 3,
+                                     'class': 'codebox form-control'}),
         label=_("Input"),
         required=False
     )
